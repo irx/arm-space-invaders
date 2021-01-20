@@ -24,7 +24,7 @@ spi_init(void)
 	SPI0->C1 = SPI_C1_SPE_MASK | SPI_C1_MSTR_MASK; /* enable spi & set as master */
 	SPI0->C1 &= ~(SPI_C1_CPOL_MASK | SPI_C1_SPIE_MASK | SPI_C1_CPHA_MASK); /* disable interrupt */
 	SPI0->C2 &= ~(SPI_C2_SPMIE_MASK); /* 8 BIT | USING POLLING */
-	SPI0->BR = 34; /* baud rate */
+	SPI0->BR = 0; /* baud rate */
 
 	PORTB->PCR[7] |= PORT_PCR_MUX(1); /* D/C */
 	PORTB->PCR[6] |= PORT_PCR_MUX(1); /* RES */

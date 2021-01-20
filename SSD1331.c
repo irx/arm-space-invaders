@@ -16,6 +16,8 @@
   * CODING INFORMATION CONTAINED HEREIN IN CONNECTION WITH THEIR PRODUCTS.
   *
   ******************************************************************************
+  *
+  * Modified by Maksymilian Mruszczak, 2021
   */
 
 /* Includes ------------------------------------------------------------------*/
@@ -407,12 +409,21 @@ void ssd1331_draw_bitmap(uint8_t chXpos, uint8_t chYpos, const uint8_t *pchBmp, 
 void ssd1331_clear_screen(uint16_t hwColor)
 {
 	uint16_t i, j;
+	uint8_t h, l;
 
+	h = hwColor >> 8;
+	l = hwColor;
+
+	ssd1331_draw_point(j, i, hwColor);
+	__SSD1331_DC_SET();
+	__SSD1331_CS_CLR();
 	for(i = 0; i < OLED_HEIGHT; i ++){
 		for(j = 0; j < OLED_WIDTH; j ++){
-			ssd1331_draw_point(j, i, hwColor);
+			__SSD1331_WRITE_BYTE(&h);
+			__SSD1331_WRITE_BYTE(&l);
 		}
 	}
+	__SSD1331_CS_SET();
 }
 
 
