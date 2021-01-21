@@ -10,6 +10,9 @@
 #include "SSD1331.h"
 #include "Fonts.h"
 
+#include "sprite.h"
+#include "assets/logo.h"
+
 static void
 delay_ms(int ms)
 {
@@ -21,6 +24,8 @@ delay_ms(int ms)
 int
 main(void)
 {
+	Sprite logo;
+
 	spi_init();
 	ssd1331_init();
 
@@ -56,6 +61,11 @@ main(void)
 	ssd1331_draw_3216char(72,16, '6', BLUE);
 
 	ssd1331_display_string(9, 48, "2015-01-27", FONT_1608, GREEN);
+
+	logo.data = sprite_logo;
+	logo.w = 96;
+	logo.h = 64;
+	draw_sprite(logo, 0, 0);
 
 	while(1)
 		;
