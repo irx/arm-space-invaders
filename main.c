@@ -11,7 +11,7 @@
 #include "Fonts.h"
 
 #include "sprite.h"
-#include "assets/logo.h"
+#include "entity.h"
 
 static void
 delay_ms(int ms)
@@ -24,10 +24,12 @@ delay_ms(int ms)
 int
 main(void)
 {
-	Sprite logo;
+	Entity *logo, *invader;
 
 	spi_init();
 	ssd1331_init();
+	init_sprites();
+	init_entities();
 
 	ssd1331_clear_screen(RED);
 	delay_ms(1000);
@@ -62,11 +64,12 @@ main(void)
 
 	ssd1331_display_string(9, 48, "2015-01-27", FONT_1608, GREEN);
 
-	logo.data = (uint16_t *)sprite_logo;
-	logo.w = 96;
-	logo.h = 64;
-	draw_sprite(&logo, 0, 0);
+	logo = create_entity(&sprite_logo, &sprite_logo, 0, 0);
+	invader = create_entity(&sprite_invader, &sprite_invader, 10, 10);
 
-	while(1)
-		;
+	for (;;) {
+		render_entities();
+		delay(2000);
+		++(invader->y);
+	}
 }

@@ -11,4 +11,8 @@ typedef struct {
 } Sprite;
 
 
+extern Sprite	sprite_invader;
+extern Sprite	sprite_logo;
+
+void		init_sprites(void);
 void		draw_sprite(const Sprite *, uint8_t, uint8_t);

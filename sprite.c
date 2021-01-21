@@ -9,12 +9,30 @@
 #include "SSD1331.h"
 #include "sprite.h"
 
+/* sprite data */
+#include "assets/invader.h"
 
-static const uint8_t oled_width = 96;
-static const uint8_t oled_height = 64;
-static const uint8_t set_column_address = 0x15;
-static const uint8_t set_row_address = 0x75;
 
+Sprite				sprite_invader;
+Sprite				sprite_logo;
+
+static const uint8_t		oled_width = 96;
+static const uint8_t		oled_height = 64;
+static const uint8_t		set_column_address = 0x15;
+static const uint8_t		set_row_address = 0x75;
+
+
+void
+init_sprites(void)
+{
+	sprite_invader.data = (uint16_t *)sprite_invader_data;
+	sprite_invader.w = 14;
+	sprite_invader.h = 10;
+
+	sprite_logo.data = (uint16_t *)sprite_logo_data;
+	sprite_logo.w = 96;
+	sprite_logo.h = 64;
+}
 
 void
 draw_sprite(const Sprite *s, uint8_t x, uint8_t y)
