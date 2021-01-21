@@ -39,6 +39,8 @@ create_entity(const Sprite *spr, const Sprite *alt, uint8_t x, uint8_t y)
 
 	entity_buf[i].exists = 1;
 	entity_buf[i].frame = 0;
+	entity_buf[i].x = x;
+	entity_buf[i].y = y;
 	entity_buf[i].sprite[0] = (Sprite *)spr;
 	entity_buf[i].sprite[1] = (Sprite *)alt;
 	if (entity_last == NULL) {
@@ -70,6 +72,8 @@ void
 render_entities(void)
 {
 	Entity *e = entity_first;
-	while (e != NULL)
+	while (e != NULL) {
 		draw_sprite(e->sprite[e->frame], e->x, e->y);
+		e = e->next;
+	}
 }
