@@ -17,9 +17,9 @@ img2u16(const Image *img)
 	Rgba cp;
 	int i, j, val;
 	uint16_t pix, *buf = (uint16_t *)malloc(sizeof(uint16_t)*img->w*img->h);
-	printf("static const uint16_t my_img[%ld][%ld] = {\n", img->h, img->w);
+	printf("/* %ldx%ld */\nstatic const uint16_t my_img[] = {\n", img->w, img->h);
 	for (i = 0; i < img->h; ++i) {
-		printf("\t{");
+		printf("\t");
 		for (j = 0; j < img->w; ++j) {
 			cp = img->d[i*img->w+j];
 			val = (cp.r * 0x1f) / 0xff;
@@ -31,14 +31,14 @@ img2u16(const Image *img)
 			buf[i*img->w+j] = pix;
 			printf("0x%04x", pix);
 			if (j+1 == img->w)
-				printf("}");
+				printf(",");
 			else
 				printf(", ");
 		}
 		if (i+1 == img->h)
 			printf("\n}\n");
 		else
-			printf(",\n");
+			printf("\n");
 	}
 	return buf;
 }

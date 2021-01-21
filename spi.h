@@ -14,4 +14,4 @@ void		spi_dc_high(void);
 void		spi_dc_low(void);
 void		spi_res_high(void);
 void		spi_res_low(void);
-void		spi_write(uint8_t *);
+void		spi_write(const uint8_t *);

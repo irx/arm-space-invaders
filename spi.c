@@ -70,7 +70,7 @@ spi_res_low(void)
 }
 
 void
-spi_write(uint8_t *data)
+spi_write(const uint8_t *data)
 {
 	/* send data through the SPI module */
 	while ((SPI0->S & SPI_S_SPTEF_MASK) != SPI_S_SPTEF_MASK);

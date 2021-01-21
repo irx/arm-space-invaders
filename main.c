@@ -62,10 +62,10 @@ main(void)
 
 	ssd1331_display_string(9, 48, "2015-01-27", FONT_1608, GREEN);
 
-	logo.data = sprite_logo;
+	logo.data = (uint16_t *)sprite_logo;
 	logo.w = 96;
 	logo.h = 64;
-	draw_sprite(logo, 0, 0);
+	draw_sprite(&logo, 0, 0);
 
 	while(1)
 		;
