@@ -10,7 +10,8 @@
 #include "entity.h"
 
 
-#define ENTITY_CNT		64
+#define NULL			(void *)0
+#define ENTITY_CNT		32
 
 
 static Entity			entity_buf[ENTITY_CNT];
