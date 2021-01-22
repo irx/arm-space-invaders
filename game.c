@@ -37,6 +37,7 @@ void game_loop()
 			ticks_till_move = (uint8_t)(2 + TICK_RATE);
 		}
 		
+		render_entities();
 		delay_ms((int)(1000/TICK_RATE));
 	}
 	
