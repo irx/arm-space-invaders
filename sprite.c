@@ -18,6 +18,9 @@ Sprite				sprite_invader;
 Sprite				sprite_invader_alt;
 Sprite				sprite_invader2;
 Sprite				sprite_invader2_alt;
+Sprite				sprite_invader3;
+Sprite				sprite_invader3_alt;
+Sprite				sprite_invader4;
 Sprite				sprite_logo;
 
 static const uint8_t		oled_width = 96;
@@ -44,6 +47,18 @@ init_sprites(void)
 	sprite_invader2_alt.data = (uint16_t *)sprite_invader2_alt_data;
 	sprite_invader2_alt.w = 14;
 	sprite_invader2_alt.h = 10;
+
+	sprite_invader3.data = (uint16_t *)sprite_invader3_data;
+	sprite_invader3.w = 14;
+	sprite_invader3.h = 10;
+
+	sprite_invader3_alt.data = (uint16_t *)sprite_invader3_alt_data;
+	sprite_invader3_alt.w = 14;
+	sprite_invader3_alt.h = 10;
+
+	sprite_invader4.data = (uint16_t *)sprite_invader4_data;
+	sprite_invader4.w = 18;
+	sprite_invader4.h = 9;
 
 	sprite_logo.data = (uint16_t *)sprite_logo_data;
 	sprite_logo.w = 96;

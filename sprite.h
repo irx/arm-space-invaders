@@ -15,6 +15,9 @@ extern Sprite	sprite_invader;
 extern Sprite	sprite_invader_alt;
 extern Sprite	sprite_invader2;
 extern Sprite	sprite_invader2_alt;
+extern Sprite	sprite_invader3;
+extern Sprite	sprite_invader3_alt;
+extern Sprite	sprite_invader4;
 extern Sprite	sprite_logo;
 
 void		init_sprites(void);
