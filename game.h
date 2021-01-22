@@ -14,3 +14,4 @@ void move_player(enum direction dir);
 void game_over(void);
 void move_projectiles(void);
 void player_hit(void);
+void delay_ms(int);

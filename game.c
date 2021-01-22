@@ -32,7 +32,7 @@ void game_loop()
 	{
 		
 		
-		
+		delay_ms((int)(1000/TICK_RATE));
 	}
 	
 }
@@ -152,3 +152,11 @@ void player_hit()
 	//else do some player hit stuff like changing sprits
 	
 }
+
+void delay_ms(int ms)
+{
+	volatile int j, k;
+	for (j = 0; j < 480; ++j)
+		for (k = 0; k < ms; ++k);
+}
+

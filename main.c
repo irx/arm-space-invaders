@@ -14,13 +14,7 @@
 #include "sprite.h"
 #include "entity.h"
 
-static void
-delay_ms(int ms)
-{
-	volatile int j, k;
-	for (j = 0; j < 480; ++j)
-		for (k = 0; k < ms; ++k);
-}
+#include "game.h"
 
 int
 main(void)
