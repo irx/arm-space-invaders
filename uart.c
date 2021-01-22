@@ -43,7 +43,7 @@ UART0_IRQHandler(void)
 {
 	char c;
 	if (UART0->S1 & UART0_S1_RDRF_MASK) {
-		inp = UART0->D;
+		c = UART0->D;
 		handle_input(c);
 		NVIC_EnableIRQ(UART0_IRQn);
 	}
