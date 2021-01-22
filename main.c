@@ -71,5 +71,6 @@ main(void)
 		render_entities();
 		delay_ms(2000);
 		++(invader->y);
+		invader->frame = invader->y % 2;
 	}
 }
