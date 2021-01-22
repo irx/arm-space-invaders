@@ -59,13 +59,13 @@ void init_level()
 			switch (i)
 			{
 				case 0:
-					create_entity(sprite_invader_1a, sprite_invader_1b, 13+13*i, 9+9*j, INVADER);
+					create_entity(sprite_invader_1a, sprite_invader_1b, 13*j, 9*i, INVADER);
 					break;
 				case 3:
-					create_entity(sprite_invader_2a, sprite_invader_2b, 13+13*i, 9+9*j, INVADER);
+					create_entity(sprite_invader_2a, sprite_invader_2b, 13*j, 9*i, INVADER);
 					break;
 				default:
-					create_entity(sprite_invader_3a, sprite_invader_3b, 13+13*i, 9+9*j, INVADER);
+					create_entity(sprite_invader_3a, sprite_invader_3b, 13*j, 9*i, INVADER);
 			}
 		}
 	}
