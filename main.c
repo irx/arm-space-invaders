@@ -7,6 +7,7 @@
 
 #include "MKL05Z4.h"
 #include "spi.h"
+#include "uart.h"
 #include "SSD1331.h"
 #include "Fonts.h"
 
@@ -28,6 +29,7 @@ main(void)
 
 	spi_init();
 	ssd1331_init();
+	uart_init();
 	init_sprites();
 	init_entities();
 
@@ -72,5 +74,18 @@ main(void)
 		delay_ms(2000);
 		++(invader->y);
 		invader->frame = invader->y % 2;
+	}
+}
+
+void
+handle_input(char c)
+{
+	switch (c) {
+	case ',':
+		/* move left */
+		break;
+	case '.':
+		/* move right */
+		break;
 	}
 }
