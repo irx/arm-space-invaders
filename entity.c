@@ -30,13 +30,14 @@ init_entities(void)
 }
 
 Entity *
-create_entity(const Sprite *spr, const Sprite *alt, uint8_t x, uint8_t y)
+create_entity(const Sprite *spr, const Sprite *alt, uint8_t x, uint8_t y, uint8_t t)
 {
 	int i = -1; /* search for free space */
 	while (entity_buf[++i].exists)
 		if (i+1 >= ENTITY_CNT)
 			return NULL;
 
+	entity_buf[i].type = 0;
 	entity_buf[i].exists = 1;
 	entity_buf[i].frame = 0;
 	entity_buf[i].x = x;
