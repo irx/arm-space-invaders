@@ -153,10 +153,10 @@ void player_hit()
 	
 }
 
-void delay_ms(int ms)
+void delay_ms( int n)
 {
-	volatile int j, k;
-	for (j = 0; j < 480; ++j)
-		for (k = 0; k < ms; ++k);
+	volatile int i, j;
+	for( i = 0 ; i < n; i++)
+	for(j = 0; j < 3500; j++) {}
 }
 
