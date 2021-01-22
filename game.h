@@ -1,4 +1,4 @@
-#define TICK_RATE 30
+#define TICK_RATE 25
 #define SPRITES_TOTAL 11
 
 
