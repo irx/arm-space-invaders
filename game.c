@@ -50,7 +50,7 @@ void init_level()
 	int i, j;
 	lives = 3;
 	init_entities();
-	player = create_entity(sprite_player, sprite_player, 26, 0, INVADER);
+	player = create_entity(sprite_player, sprite_player, 26, 63, INVADER);
 	
 	for (i = 0; i < 4; i++)
 	{
