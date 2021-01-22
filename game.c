@@ -59,13 +59,13 @@ void init_level()
 			switch (i)
 			{
 				case 0:
-					create_entity(sprite_invader_1a, sprite_invader_1b, 87-i*9, 0+13*j, INVADER);
+					create_entity(sprite_invader_1a, sprite_invader_1b, 0+13*j, 9+9*i, INVADER);
 					break;
 				case 3:
-					create_entity(sprite_invader_2a, sprite_invader_2b, 87-i*9, 0+13*j, INVADER);
+					create_entity(sprite_invader_2a, sprite_invader_2b, 0+13*j, 9+9*i, INVADER);
 					break;
 				default:
-					create_entity(sprite_invader_3a, sprite_invader_3b, 87-i*9, 0+13*j, INVADER);	
+					create_entity(sprite_invader_3a, sprite_invader_3b, 0+13*j, 9+9*i, INVADER);	
 			}
 		}
 	}
@@ -92,8 +92,8 @@ void move_invaders()
 				while (i->next != NULL) //moving invaders down
 				{
 					i = i->next;
-					--(i->y);
-					if (i->y<15) game_over();
+					++(i->y);
+					if ((i->y)>49) game_over();
 				}
 				invaders_dir = (invaders_dir+1)%2;
 				break;
