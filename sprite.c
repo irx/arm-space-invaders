@@ -12,6 +12,7 @@
 /* sprite data */
 #include "assets/invader.h"
 #include "assets/logo.h"
+#include "assets/player.h"
 
 
 Sprite				sprite_invader;
@@ -22,6 +23,7 @@ Sprite				sprite_invader3;
 Sprite				sprite_invader3_alt;
 Sprite				sprite_invader4;
 Sprite				sprite_logo;
+Sprite				sprite_player;
 
 static const uint8_t		oled_width = 96;
 static const uint8_t		oled_height = 64;
@@ -63,6 +65,10 @@ init_sprites(void)
 	sprite_logo.data = (uint16_t *)sprite_logo_data;
 	sprite_logo.w = 96;
 	sprite_logo.h = 64;
+
+	sprite_player.data = (uint16_t *)sprite_player_data;
+	sprite_player.w = 12;
+	sprite_player.h = 8;
 }
 
 void
