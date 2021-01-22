@@ -11,6 +11,7 @@
 
 /* sprite data */
 #include "assets/invader.h"
+#include "assets/logo.h"
 
 
 Sprite				sprite_invader;

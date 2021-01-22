@@ -64,12 +64,12 @@ main(void)
 
 	ssd1331_display_string(9, 48, "2015-01-27", FONT_1608, GREEN);
 
-	logo = create_entity(&sprite_logo, &sprite_logo, 0, 0);
-	invader = create_entity(&sprite_invader, &sprite_invader, 10, 10);
+	logo = create_entity(&sprite_logo, &sprite_logo, 0, 0, 0);
+	invader = create_entity(&sprite_invader, &sprite_invader, 10, 10, 0);
 
 	for (;;) {
 		render_entities();
-		delay(2000);
+		delay_ms(2000);
 		++(invader->y);
 	}
 }

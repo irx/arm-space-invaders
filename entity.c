@@ -37,7 +37,7 @@ create_entity(const Sprite *spr, const Sprite *alt, uint8_t x, uint8_t y, uint8_
 		if (i+1 >= ENTITY_CNT)
 			return NULL;
 
-	entity_buf[i].type = 0;
+	entity_buf[i].type = t;
 	entity_buf[i].exists = 1;
 	entity_buf[i].frame = 0;
 	entity_buf[i].x = x;

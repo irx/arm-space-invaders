@@ -10,7 +10,6 @@ struct Entity {
 	Sprite *sprite[2];
 	uint8_t exists, frame, x, y, type;
 	Entity *next, *prev;
-	
 };
 
 void			init_entities(void);
