@@ -18,7 +18,7 @@ static Sprite *sprite_invader_3b = &sprite_invader; //TEMP
 static Entity *player;
 static Entity *saucer;
 static enum direction invaders_dir = RIGHT;
-static  uint8_t level_speed = 1;
+static  uint8_t level_speed = 0; //max 30
 static uint16_t score = 0;
 static uint16_t high_score = 0;
 static uint8_t lives = 3;
@@ -26,11 +26,16 @@ static uint8_t lives = 3;
 void game_loop()	
 {
 	score = 0;
-
+	uint8_t ticks_till_move = (uint8_t)(2 + TICK_RATE);// formula: (uint8_t)(1 + TICK_RATE - level_speed*TICK_RATE/32)
 	init_level();
 	while (1)
 	{
-		
+		if (!(--ticks_till_move))
+		{
+			move_invaders();
+			if (level_speed<30) ++level_speed;
+			ticks_till_move = (uint8_t)(2 + TICK_RATE);
+		}
 		
 		delay_ms((int)(1000/TICK_RATE));
 	}
@@ -87,7 +92,6 @@ void move_invaders()
 				{
 					i = i->next;
 					--(i->y);
-					++level_speed;
 					if (i->y<15) game_over();
 				}
 				invaders_dir = (invaders_dir+1)%2;
