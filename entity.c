@@ -47,8 +47,10 @@ create_entity(const Sprite *spr, const Sprite *alt, uint8_t x, uint8_t y, uint8_
 	if (entity_last == NULL) {
 		entity_buf[i].prev = NULL;
 		entity_first = &entity_buf[i];
-	} else
+	} else {
 		entity_buf[i].prev = entity_last;
+		entity_last->next = &entity_buf[i];
+	}
 	entity_buf[i].next = NULL;
 	entity_last = &entity_buf[i];
 	return entity_last;
