@@ -86,7 +86,7 @@ void move_invaders()
 		i = i->next;
 		if (i->type == INVADER)
 		{
-			if ((i->x > 0+invaders_dir) && (i->x < 52-invaders_dir)) //checking if direction swap takes place
+			if ((i->x == 0) || (i->x == 52)) //checking if direction swap takes place
 			{
 				i = player;
 				while (i->next != NULL) //moving invaders down
