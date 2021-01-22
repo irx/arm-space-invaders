@@ -76,10 +76,10 @@ handle_input(char c)
 {
 	switch (c) {
 	case ',':
-		/* move left */
+		move_player(LEFT);
 		break;
 	case '.':
-		/* move right */
+		move_player(RIGHT);
 		break;
 	}
 }
