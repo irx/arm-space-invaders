@@ -12,6 +12,7 @@ typedef struct {
 
 
 extern Sprite	sprite_invader;
+extern Sprite	sprite_invader_alt;
 extern Sprite	sprite_logo;
 
 void		init_sprites(void);

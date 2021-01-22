@@ -15,6 +15,7 @@
 
 
 Sprite				sprite_invader;
+Sprite				sprite_invader_alt;
 Sprite				sprite_logo;
 
 static const uint8_t		oled_width = 96;
@@ -29,6 +30,10 @@ init_sprites(void)
 	sprite_invader.data = (uint16_t *)sprite_invader_data;
 	sprite_invader.w = 14;
 	sprite_invader.h = 10;
+
+	sprite_invader_alt.data = (uint16_t *)sprite_invader_alt_data;
+	sprite_invader_alt.w = 14;
+	sprite_invader_alt.h = 10;
 
 	sprite_logo.data = (uint16_t *)sprite_logo_data;
 	sprite_logo.w = 96;
