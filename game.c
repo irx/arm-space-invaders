@@ -18,13 +18,14 @@ static Sprite *sprite_invader_3b = &sprite_invader; //TEMP
 static Entity *player;
 static Entity *saucer;
 static enum direction invaders_dir = RIGHT;
-static  uint8_t level_speed = 0; //max 30
+static uint8_t level_speed = 5; //default 1, max 30
 static uint16_t score = 0;
 static uint16_t high_score = 0;
 static uint8_t lives = 3;
 
 void game_loop()	
 {
+	 
 	score = 0;
 	uint8_t ticks_till_move = (uint8_t)(2 + TICK_RATE);// formula: (uint8_t)(2 + TICK_RATE - level_speed*TICK_RATE/32)
 	init_level();
@@ -49,7 +50,7 @@ void init_level()
 	int i, j;
 	lives = 3;
 	init_entities();
-	player = create_entity(sprite_player, sprite_player, 26, 63, INVADER);
+	player = create_entity(sprite_player, sprite_player, 26, 56, INVADER);
 	
 	for (i = 0; i < 4; i++)
 	{
@@ -58,13 +59,13 @@ void init_level()
 			switch (i)
 			{
 				case 0:
-					create_entity(sprite_invader_1a, sprite_invader_1b, 0+13*j, 9+9*i, INVADER);
+					create_entity(sprite_invader_1a, sprite_invader_1b, 13+13*j, 9+9*i, INVADER);
 					break;
 				case 3:
-					create_entity(sprite_invader_2a, sprite_invader_2b, 0+13*j, 9+9*i, INVADER);
+					create_entity(sprite_invader_2a, sprite_invader_2b, 13+13*j, 9+9*i, INVADER);
 					break;
 				default:
-					create_entity(sprite_invader_3a, sprite_invader_3b, 0+13*j, 9+9*i, INVADER);	
+					create_entity(sprite_invader_3a, sprite_invader_3b, 13+13*j, 9+9*i, INVADER);	
 			}
 		}
 	}
@@ -86,14 +87,14 @@ void move_invaders()
 		i = i->next;
 		if (i->type == INVADER)
 		{
-			if ((i->x == 0) || (i->x == 52)) //checking if direction swap takes place
+			if (((i->x == 0) && !invaders_dir) || ((i->x == 52) && invaders_dir)) //checking if direction swap takes place
 			{
 				i = player;
 				while (i->next != NULL) //moving invaders down
 				{
 					i = i->next;
 					++(i->y);
-					if ((i->y)>49) game_over();
+					if ((i->y)>41) game_over();
 					if (level_speed<31) ++level_speed;
 				}
 				invaders_dir = (invaders_dir+1)%2;
@@ -104,9 +105,9 @@ void move_invaders()
 	i = player;
 	while (i->next != NULL) //moving left|right
 	{
+		i = i->next;
 		if (i->type == INVADER)
 		{
-			i = i->next;
 			if (invaders_dir) ++(i->x);
 			else --(i->x);
 		}
