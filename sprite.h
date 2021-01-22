@@ -16,4 +16,4 @@ extern Sprite	sprite_invader_alt;
 extern Sprite	sprite_logo;
 
 void		init_sprites(void);
-void		draw_sprite(const Sprite *, uint8_t, uint8_t, uint8_t);
+void		draw_sprite(const Sprite *, uint8_t, uint8_t);
