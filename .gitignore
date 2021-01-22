@@ -1,3 +1,19 @@
 jpeg2c/jpeg2c
 *.o
 *.swp
+*.uvoptx
+*.uvoptx
+*.uvprojx
+*.d
+RTE/Device/MKL05Z32xxx4/system_MKL05Z4.c
+RTE/Device/MKL05Z32xxx4/startup_MKL05Z4.s
+RTE/_Target_1/RTE_Components.h
+Objects/ARM-game_Target 1.dep
+Objects/ARM-game.lnp
+Objects/ARM-game.htm
+Objects/ARM-game.build_log.htm
+Objects/ARM-game.axf
+Listings/ARM-game.map
+JLinkSettings.ini
+JLinkLog.txt
+ARM-game.uvguix.micha
