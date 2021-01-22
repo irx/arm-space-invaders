@@ -26,15 +26,14 @@ static uint8_t lives = 3;
 void game_loop()	
 {
 	score = 0;
-	uint8_t ticks_till_move = (uint8_t)(2 + TICK_RATE);// formula: (uint8_t)(1 + TICK_RATE - level_speed*TICK_RATE/32)
+	uint8_t ticks_till_move = (uint8_t)(2 + TICK_RATE);// formula: (uint8_t)(2 + TICK_RATE - level_speed*TICK_RATE/32)
 	init_level();
 	while (1)
 	{
 		if (!(--ticks_till_move))
 		{
 			move_invaders();
-			if (level_speed<30) ++level_speed;
-			ticks_till_move = (uint8_t)(2 + TICK_RATE);
+			ticks_till_move = (uint8_t)(2 + TICK_RATE - level_speed*TICK_RATE/32);
 		}
 		
 		render_entities();
@@ -74,6 +73,7 @@ void init_level()
 
 void game_over()
 {
+	delete_entity(player);
 	//gonna display score and wait for any input to restart the game
 	//show score, compare score and current highscore
 }
@@ -94,6 +94,7 @@ void move_invaders()
 					i = i->next;
 					++(i->y);
 					if ((i->y)>49) game_over();
+					if (level_speed<31) ++level_speed;
 				}
 				invaders_dir = (invaders_dir+1)%2;
 				break;
