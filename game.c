@@ -27,6 +27,14 @@ void game_loop()
 	score = 0;
 	uint8_t ticks_till_move = (uint8_t)(2 + TICK_RATE);// formula: (uint8_t)(2 + TICK_RATE - level_speed*TICK_RATE/32)
 	init_level(42,54);
+	
+	if (!input_queue)
+	{
+		if (input_queue & INPUT_SHOOT) player_shoot();
+		if (input_queue & INPUT_LEFT) move_player(LEFT);
+		else if (input_queue & INPUT_RIGHT) move_player(RIGHT);
+	}
+	
 	while (1)
 	{
 		if (game_state == LEVEL)
