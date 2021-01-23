@@ -106,7 +106,8 @@ void game_over()
 void move_invaders()
 {
 	Entity *i = player;
-	static uint8_t dir_swap, move_down;
+	static uint8_t dir_swap = 0;
+	static uint8_t move_down = 0;
 				
 	i = player;
 	while (i->next != NULL) //moving left|right
@@ -124,7 +125,7 @@ void move_invaders()
 			if (invaders_dir) ++(i->x);
 			else --(i->x);
 		}
-		if (dir_swap){ invaders_dir = (invaders_dir+1)%2; move_down = 1;}
+		if (dir_swap){ invaders_dir = (invaders_dir+1)%2; move_down = 1; dir_swap = 0;}
 		else move_down = 0;
 	}
 	pending_render=1;
