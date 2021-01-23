@@ -5,10 +5,6 @@
 #include "SSD1331.h"
 
 
-static Sprite *bullet1 = &sprite_player;
-static Sprite *bullet2 = &sprite_player;
-	
-
 static Entity *player;
 static Entity *saucer;
 static enum direction invaders_dir = RIGHT;
@@ -184,13 +180,13 @@ void player_shoot()
 {
 	if (!cooldown)
 	{
-	create_entity(bullet1, bullet1, (player->x)+(player->sprite[0]->w)/2, 55-(bullet1->h), MISSILE_GOOD);
+	create_entity(&sprite_laser2, &sprite_laser2_alt, (player->x)+(player->sprite[0]->w)/2, 55-(sprite_laser2.h), MISSILE_GOOD);
 	cooldown = SHOOT_COOLDOWN;
 	}
 }
 void invader_shoot(Entity *e)
 {
-	create_entity(bullet2, bullet2, (e->x)+(e->sprite[0]->w)/2, (e->y)+1, MISSILE_BAD);
+	create_entity(&sprite_laser1, &sprite_laser1_alt, (e->x)+(e->sprite[0]->w)/2, (e->y)+1, MISSILE_BAD);
 }
 
 

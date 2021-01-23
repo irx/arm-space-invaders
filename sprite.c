@@ -10,11 +10,16 @@
 #include "sprite.h"
 
 /* sprite data */
+#include "assets/laser.h"
 #include "assets/invader.h"
 #include "assets/logo.h"
 #include "assets/player.h"
 
 
+Sprite				sprite_laser1;
+Sprite				sprite_laser1_alt;
+Sprite				sprite_laser2;
+Sprite				sprite_laser2_alt;
 Sprite				sprite_invader;
 Sprite				sprite_invader_alt;
 Sprite				sprite_invader2;
@@ -34,6 +39,22 @@ static const uint8_t		set_row_address = 0x75;
 void
 init_sprites(void)
 {
+	sprite_laser1.data = (uint16_t *)sprite_laser1_data;
+	sprite_laser1.w = 2;
+	sprite_laser1.h = 5;
+
+	sprite_laser1_alt.data = (uint16_t *)sprite_laser1_alt_data;
+	sprite_laser1_alt.w = 2;
+	sprite_laser1_alt.h = 5;
+
+	sprite_laser2.data = (uint16_t *)sprite_laser2_data;
+	sprite_laser2.w = 1;
+	sprite_laser2.h = 5;
+
+	sprite_laser2_alt.data = (uint16_t *)sprite_laser2_alt_data;
+	sprite_laser2_alt.w = 1;
+	sprite_laser2_alt.h = 5;
+
 	sprite_invader.data = (uint16_t *)sprite_invader_data;
 	sprite_invader.w = 14;
 	sprite_invader.h = 10;
