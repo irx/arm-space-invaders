@@ -76,13 +76,13 @@ handle_input(char c)
 {
 	switch (c) {
 	case ',':
-		move_player(LEFT);
+		queue_input(INPUT_LEFT);
 		break;
 	case '.':
-		move_player(RIGHT);
+		queue_input(INPUT_RIGHT);
 		break;
 	case ' ':
-		player_shoot();
+		queue_input(INPUT_SHOOT);
 		break;
 	}
 }

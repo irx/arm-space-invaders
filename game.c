@@ -18,6 +18,7 @@ static uint16_t high_score = 0;
 static uint8_t lives = 3;
 static uint8_t cooldown=0;
 static uint8_t kill_count=0;
+static uint8_t input_queue = 0;
 enum state game_state = MENU;
 
 void game_loop()
@@ -163,7 +164,7 @@ void move_projectiles()
 }
 void move_player(enum direction dir)
 {
-	if ((player->x > 0+dir) && (player->x < 86-dir)) //out-of-bonds checking
+	if ((player->x >= 1-dir) && (player->x <= 86+dir)) //out-of-bonds checking
 	{
 		if (dir) ++(player->x);
 		else --(player->x);
@@ -198,4 +199,9 @@ void delay_ms( int n)
 	volatile int i, j;
 	for( i = 0 ; i < n; i++)
 	for(j = 0; j < 3500; j++) {}
+}
+
+void queue_input(enum input_type input)
+{
+	input_queue = input_queue | input;
 }
