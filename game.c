@@ -33,6 +33,7 @@ void game_loop()
 				move_invaders();
 				ticks_till_move = (uint8_t)(2 + TICK_RATE - level_speed*TICK_RATE/32);
 			}
+			move_projectiles();
 		}
 		
 		render_entities();
@@ -47,6 +48,7 @@ void init_level()
 	ssd1331_clear_screen(BLACK);
 	int i, j;
 	lives = 3;
+	invaders_dir = RIGHT;
 	init_entities();
 	player = create_entity(&sprite_player, &sprite_player, 26, 54, INVADER);
 	for (i = 0; i < 4; i++)
@@ -56,13 +58,13 @@ void init_level()
 			switch (i)
 			{
 				case 0:
-					create_entity(&sprite_invader, &sprite_invader_alt, 13*j, 9*i, INVADER);
+					create_entity(&sprite_invader2, &sprite_invader2_alt, 2+13*j, 9*i, INVADER);
 					break;
 				case 3:
-					create_entity(&sprite_invader2, &sprite_invader2_alt, 13*j, 9*i, INVADER);
+					create_entity(&sprite_invader3, &sprite_invader3_alt, 2+13*j, 9*i, INVADER);
 					break;
 				default:
-					create_entity(&sprite_invader3, &sprite_invader3_alt, 13*j, 9*i, INVADER);
+					create_entity(&sprite_invader, &sprite_invader_alt, 2+13*j, 9*i, INVADER);
 			}
 		}
 	}
