@@ -3,10 +3,11 @@
 
 
 enum entity_type{ PLAYER, INVADER, SAUCER, MISSILE_GOOD, MISSILE_BAD };
+enum state{ MENU, PAUSE, LEVEL };
 enum direction{ LEFT, RIGHT};
 
-
-
+extern enum state game_state;
+	
 void game_loop(void);
 void init_level(void);
 void move_invaders(void);
@@ -15,3 +16,5 @@ void game_over(void);
 void move_projectiles(void);
 void player_hit(void);
 void delay_ms(int);
+void player_shoot(void);
+void invader_shoot(Entity *e);

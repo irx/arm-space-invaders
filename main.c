@@ -81,5 +81,8 @@ handle_input(char c)
 	case '.':
 		move_player(RIGHT);
 		break;
+	case ' ':
+		player_shoot();
+		break;
 	}
 }

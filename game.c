@@ -1,27 +1,22 @@
 #include "MKL05Z4.h"
+#include "sprite.h"
+#include "entity.h"
 #include "game.h"
 #include "SSD1331.h"
-#include "sprite.h"
 
-#include "entity.h"
 
-//-------------------temps
-static Sprite *sprite_player = &sprite_invader; //TEMP
-static Sprite *sprite_invader_1a = &sprite_invader; //TEMP
-static Sprite *sprite_invader_1b = &sprite_invader_alt; //TEMP
-static Sprite *sprite_invader_2a = &sprite_invader; //TEMP
-static Sprite *sprite_invader_2b = &sprite_invader; //TEMP
-static Sprite *sprite_invader_3a = &sprite_invader; //TEMP
-static Sprite *sprite_invader_3b = &sprite_invader; //TEMP
-//-----------------
+static Sprite *bullet1 = &sprite_player;
+static Sprite *bullet2 = &sprite_player;
+	
 
 static Entity *player;
 static Entity *saucer;
 static enum direction invaders_dir = RIGHT;
-static uint8_t level_speed = 5; //default 1, max 30
+static uint8_t level_speed = 6; //default 1, max 30, temp 6 for tests
 static uint16_t score = 0;
 static uint16_t high_score = 0;
 static uint8_t lives = 3;
+enum state game_state = MENU;
 
 void game_loop()
 {
@@ -31,12 +26,15 @@ void game_loop()
 	init_level();
 	while (1)
 	{
-		if (!(--ticks_till_move))
+		if (game_state == LEVEL)
 		{
-			move_invaders();
-			ticks_till_move = (uint8_t)(2 + TICK_RATE - level_speed*TICK_RATE/32);
+			if (!(--ticks_till_move))
+			{
+				move_invaders();
+				ticks_till_move = (uint8_t)(2 + TICK_RATE - level_speed*TICK_RATE/32);
+			}
 		}
-
+		
 		render_entities();
 		delay_ms((int)(1000/TICK_RATE));
 	}
@@ -50,8 +48,7 @@ void init_level()
 	int i, j;
 	lives = 3;
 	init_entities();
-	player = create_entity(sprite_player, sprite_player, 26, 54, INVADER);
-
+	player = create_entity(&sprite_player, &sprite_player, 26, 54, INVADER);
 	for (i = 0; i < 4; i++)
 	{
 		for (j = 0; j < 5; j++)
@@ -59,24 +56,29 @@ void init_level()
 			switch (i)
 			{
 				case 0:
-					create_entity(sprite_invader_1a, sprite_invader_1b, 13*j, 9*i, INVADER);
+					create_entity(&sprite_invader, &sprite_invader_alt, 13*j, 9*i, INVADER);
 					break;
 				case 3:
-					create_entity(sprite_invader_2a, sprite_invader_2b, 13*j, 9*i, INVADER);
+					create_entity(&sprite_invader2, &sprite_invader2_alt, 13*j, 9*i, INVADER);
 					break;
 				default:
-					create_entity(sprite_invader_3a, sprite_invader_3b, 13*j, 9*i, INVADER);
+					create_entity(&sprite_invader3, &sprite_invader3_alt, 13*j, 9*i, INVADER);
 			}
 		}
 	}
+	game_state = LEVEL;
 }
 
 
 void game_over()
 {
+	game_state = PAUSE;
 	delete_entity(player);
 	//gonna display score and wait for any input to restart the game
 	//show score, compare score and current highscore
+	delay_ms(2000);
+	init_level();
+	
 }
 
 void move_invaders()
@@ -87,7 +89,7 @@ void move_invaders()
 		i = i->next;
 		if (i->type == INVADER)
 		{
-			if (((i->x == 0) && !invaders_dir) || ((i->x == 52) && invaders_dir)) //checking if direction swap takes place
+			if (((i->x == 0) && !invaders_dir) || ((i->x == 82) && invaders_dir)) //checking if direction swap takes place
 			{
 				i = player;
 				while (i->next != NULL) //moving invaders down
@@ -108,7 +110,7 @@ void move_invaders()
 		i = i->next;
 		if (i->type == INVADER)
 		{
-			i->frame = ((i->frame)+1)%2 // animate 'em!
+			i->frame = ((i->frame)+1)%2; // animate 'em!
 			if (invaders_dir) ++(i->x);
 			else --(i->x);
 		}
@@ -116,48 +118,61 @@ void move_invaders()
 }
 void move_projectiles()
 {
-	Entity *i = player;
-	Entity *j = player;
+	Entity *i = player; //bullet pointer
+	Entity *j = player; //scanned entities pointer
 	while (i->next != NULL)
 	{
 		i = i->next;
 		if (i->type == MISSILE_GOOD)
 		{
-			++(i->y);
+			--(i->y);
 			while (j->next != NULL) //scanning entities for hit
 			{
 				j = j->next;
-				if ( ((i->x) < (j->x)) && ((i->x)+(i->sprite[0]->w)-1 > (j->x)) && ((i->y) == (j->y)+2) )
+				if ( ((i->x)+(i->sprite[0]->w)-2 > (j->x)) && ((i->x)+1 < (j->x)+(j->sprite[0]->w)-1) && ((i->y) == (j->y)+(j->sprite[0]->h)-1) )
 				{
 					score+=10;
 					delete_entity(i);
 					delete_entity(j);
 					break;
 				}
-				else if ((i->y) == 62) delete_entity(i); //projectile out of bonds
+				else if ((i->y) == 0) delete_entity(i); //projectile out of bonds
 			}
 		}
 		else if(i->type == MISSILE_BAD)
 		{
-			--(i->y);
-			if ( ((i->y) == 4) && ((i->x) > (player->x)) && ((i->x) < (player->x)+11) ) //player hit
+			++(i->y);
+			if ( ((i->y) == 59) && ((i->x)+(i->sprite[0]->w)-2 > (player->x)) && ((i->x)+1 < (player->x)+(player->sprite[0]->w)-1) ) //player hit
 				player_hit();
 		}
 	}
 }
 void move_player(enum direction dir)
 {
-	if ((player->x > 0+dir) && (player->x < 54-dir)) //out-of-bonds checking
+	if ((player->x > 0+dir) && (player->x < 86-dir)) //out-of-bonds checking
 	{
 		if (dir) ++(player->x);
 		else --(player->x);
 	}
 }
 
+void player_shoot()
+{
+	create_entity(bullet1, bullet1, (player->x)+(player->sprite[0]->w)/2, 55-(bullet1->h), MISSILE_GOOD);
+}
+
+void invader_shoot(Entity *e)
+{
+	create_entity(bullet2, bullet2, (e->x)+(e->sprite[0]->w)/2, (e->y)+1, MISSILE_BAD);
+}
+
+
+
+
 void player_hit()
 {
 	if (!(--lives)) game_over();
-	//else do some player hit stuff like changing sprits
+	//else do some player hit stuff like changing sprites
 
 }
 
