@@ -240,7 +240,7 @@ void game_pause()
 void game_unpause()
 {
 	input_queue = 0;
-	ssd1331_clear_screen(BLUE);
+	ssd1331_clear_screen(BLACK);
 	game_state = LEVEL;
 	render_entities();
 	delay_ms(250);
