@@ -19,6 +19,7 @@ static uint8_t lives = 3;
 static uint8_t cooldown=0;
 static uint8_t kill_count=0;
 static uint8_t input_queue = 0;
+static uint8_t saucer_timer = 255;
 enum state game_state = MENU;
 
 void game_loop()
