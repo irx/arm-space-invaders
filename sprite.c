@@ -66,9 +66,17 @@ init_sprites(void)
 	sprite_logo.w = 96;
 	sprite_logo.h = 64;
 
-	sprite_player.data = (uint16_t *)sprite_player_data;
-	sprite_player.w = 12;
-	sprite_player.h = 8;
+	sprite_player_g.data = (uint16_t *)sprite_player_g_data;
+	sprite_player_g.w = 13;
+	sprite_player_g.h = 5;
+
+	sprite_player_y.data = (uint16_t *)sprite_player_y_data;
+	sprite_player_y.w = 13;
+	sprite_player_y.h = 5;
+
+	sprite_player_r.data = (uint16_t *)sprite_player_r_data;
+	sprite_player_r.w = 13;
+	sprite_player_r.h = 5;
 }
 
 void

@@ -62,7 +62,8 @@ void init_level(uint8_t x, uint8_t y)
 	lives = 3;
 	invaders_dir = RIGHT;
 	init_entities();
-	player = create_entity(&sprite_player, &sprite_player, x, y, INVADER);
+	player = create_entity(&sprite_player_g, &sprite_player_y, x, y, INVADER);
+	player->sprite[2] = &sprite_player_r;
 	for (i = 0; i < 4; i++)
 	{
 		for (j = 0; j < 5; j++)
