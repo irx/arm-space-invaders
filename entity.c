@@ -59,6 +59,7 @@ create_entity(const Sprite *spr, const Sprite *alt, uint8_t x, uint8_t y, uint8_
 void
 delete_entity(Entity *e)
 {
+	clear_sprite(e->sprite[e->frame], e->x, e->y);
 	/* relink list and freeup the slot */
 	if (e->prev != NULL)
 		e->prev->next = e->next;

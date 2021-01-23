@@ -5,6 +5,10 @@
  */
 
 
+#define draw_sprite(s, x, y)	draw_clear_sprite(1, s, x, y)
+#define clear_sprite(s, x, y)	draw_clear_sprite(0, s, x, y)
+
+
 typedef struct {
 	uint16_t *data;
 	uint8_t w, h;
@@ -22,4 +26,4 @@ extern Sprite	sprite_logo;
 extern Sprite	sprite_player;
 
 void		init_sprites(void);
-void		draw_sprite(const Sprite *, uint8_t, uint8_t);
+void		draw_clear_sprite(uint8_t, const Sprite *, uint8_t, uint8_t);

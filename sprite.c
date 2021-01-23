@@ -72,10 +72,10 @@ init_sprites(void)
 }
 
 void
-draw_sprite(const Sprite *s, uint8_t x, uint8_t y)
+draw_clear_sprite(uint8_t draw, const Sprite *s, uint8_t x, uint8_t y)
 {
-	int i, j, idx;
 	uint8_t h, l;
+	int i, j, idx = 0;
 
 	/* prepare for CMD input */
 	__SSD1331_DC_CLR();
@@ -95,7 +95,7 @@ draw_sprite(const Sprite *s, uint8_t x, uint8_t y)
 	for (i = 0; i < s->h; ++i) {
 		/* write a row of pixels and change pos to the next line */
 		for (j = 0; j < s->w; ++j) {
-			idx = i * s->w + j;
+			idx = (i * s->w + j) * draw;
 			h = s->data[idx] >> 8;
 			l = s->data[idx];
 			__SSD1331_WRITE_BYTE(&h);
