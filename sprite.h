@@ -15,6 +15,10 @@ typedef struct {
 } Sprite;
 
 
+extern Sprite	sprite_laser1;
+extern Sprite	sprite_laser1_alt;
+extern Sprite	sprite_laser2;
+extern Sprite	sprite_laser2_alt;
 extern Sprite	sprite_invader;
 extern Sprite	sprite_invader_alt;
 extern Sprite	sprite_invader2;
@@ -23,7 +27,9 @@ extern Sprite	sprite_invader3;
 extern Sprite	sprite_invader3_alt;
 extern Sprite	sprite_invader4;
 extern Sprite	sprite_logo;
-extern Sprite	sprite_player;
+extern Sprite	sprite_player_g;
+extern Sprite	sprite_player_y;
+extern Sprite	sprite_player_r;
 
 void		init_sprites(void);
 void		draw_clear_sprite(uint8_t, const Sprite *, uint8_t, uint8_t);

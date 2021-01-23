@@ -10,11 +10,16 @@
 #include "sprite.h"
 
 /* sprite data */
+#include "assets/laser.h"
 #include "assets/invader.h"
 #include "assets/logo.h"
 #include "assets/player.h"
 
 
+Sprite				sprite_laser1;
+Sprite				sprite_laser1_alt;
+Sprite				sprite_laser2;
+Sprite				sprite_laser2_alt;
 Sprite				sprite_invader;
 Sprite				sprite_invader_alt;
 Sprite				sprite_invader2;
@@ -23,7 +28,9 @@ Sprite				sprite_invader3;
 Sprite				sprite_invader3_alt;
 Sprite				sprite_invader4;
 Sprite				sprite_logo;
-Sprite				sprite_player;
+Sprite				sprite_player_g;
+Sprite				sprite_player_y;
+Sprite				sprite_player_r;
 
 static const uint8_t		oled_width = 96;
 static const uint8_t		oled_height = 64;
@@ -34,6 +41,22 @@ static const uint8_t		set_row_address = 0x75;
 void
 init_sprites(void)
 {
+	sprite_laser1.data = (uint16_t *)sprite_laser1_data;
+	sprite_laser1.w = 2;
+	sprite_laser1.h = 5;
+
+	sprite_laser1_alt.data = (uint16_t *)sprite_laser1_alt_data;
+	sprite_laser1_alt.w = 2;
+	sprite_laser1_alt.h = 5;
+
+	sprite_laser2.data = (uint16_t *)sprite_laser2_data;
+	sprite_laser2.w = 1;
+	sprite_laser2.h = 5;
+
+	sprite_laser2_alt.data = (uint16_t *)sprite_laser2_alt_data;
+	sprite_laser2_alt.w = 1;
+	sprite_laser2_alt.h = 5;
+
 	sprite_invader.data = (uint16_t *)sprite_invader_data;
 	sprite_invader.w = 14;
 	sprite_invader.h = 10;
@@ -59,16 +82,24 @@ init_sprites(void)
 	sprite_invader3_alt.h = 10;
 
 	sprite_invader4.data = (uint16_t *)sprite_invader4_data;
-	sprite_invader4.w = 18;
-	sprite_invader4.h = 9;
+	sprite_invader4.w = 20;
+	sprite_invader4.h = 7;
 
 	sprite_logo.data = (uint16_t *)sprite_logo_data;
 	sprite_logo.w = 96;
 	sprite_logo.h = 64;
 
-	sprite_player.data = (uint16_t *)sprite_player_data;
-	sprite_player.w = 12;
-	sprite_player.h = 8;
+	sprite_player_g.data = (uint16_t *)sprite_player_g_data;
+	sprite_player_g.w = 13;
+	sprite_player_g.h = 5;
+
+	sprite_player_y.data = (uint16_t *)sprite_player_y_data;
+	sprite_player_y.w = 13;
+	sprite_player_y.h = 5;
+
+	sprite_player_r.data = (uint16_t *)sprite_player_r_data;
+	sprite_player_r.w = 13;
+	sprite_player_r.h = 5;
 }
 
 void

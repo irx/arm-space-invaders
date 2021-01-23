@@ -7,7 +7,7 @@
 
 typedef struct Entity Entity;
 struct Entity {
-	Sprite *sprite[2];
+	Sprite *sprite[3];
 	uint8_t exists, frame, x, y, type;
 	Entity *next, *prev;
 };
