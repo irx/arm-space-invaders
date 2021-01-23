@@ -30,6 +30,7 @@ void game_loop()
 		if (input_queue & INPUT_SHOOT) player_shoot();
 		if (input_queue & INPUT_LEFT) move_player(LEFT);
 		else if (input_queue & INPUT_RIGHT) move_player(RIGHT);
+		input_queue = 0;
 	}
 	
 	while (1)
