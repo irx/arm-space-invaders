@@ -28,7 +28,9 @@ Sprite				sprite_invader3;
 Sprite				sprite_invader3_alt;
 Sprite				sprite_invader4;
 Sprite				sprite_logo;
-Sprite				sprite_player;
+Sprite				sprite_player_g;
+Sprite				sprite_player_y;
+Sprite				sprite_player_r;
 
 static const uint8_t		oled_width = 96;
 static const uint8_t		oled_height = 64;

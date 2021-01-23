@@ -20,4 +20,4 @@ void player_hit(void);
 void delay_ms(int);
 void player_shoot(void);
 void invader_shoot(Entity *e);
-void queue_input(enum input_type input)
+void queue_input(enum input_type input);
