@@ -8,7 +8,7 @@
 static Entity *player;
 static Entity *saucer;
 static enum direction invaders_dir = RIGHT;
-static uint8_t level_speed = 6; //default 1, max 30, temp 6 for tests
+static uint8_t level_speed = 6; //default 1, max 45, temp 6 for tests
 static uint16_t score = 0;
 static uint16_t high_score = 0;
 static uint8_t lives = 3;
@@ -45,9 +45,9 @@ void game_loop()
 			if (!(--ticks_till_move))
 			{
 				move_invaders();
-				ticks_till_move = (uint8_t)(2 + TICK_RATE/2 - level_speed*TICK_RATE/40);
+				ticks_till_move = (uint8_t)(2 + TICK_RATE - level_speed*TICK_RATE/40);
 			}
-			if (speedup_timer) --speedup_timer;
+			if (speedup_timer && level_speed < 40) --speedup_timer;
 				else { ++level_speed; speedup_timer = TICKS_PER_SPEEDUP; }
 			if (cooldown) --cooldown;
 			move_projectiles();
