@@ -22,3 +22,4 @@ void player_shoot(void);
 void invader_shoot(Entity *e);
 void queue_input(enum input_type input);
 void game_pause(void);
+void game_unpause(void);

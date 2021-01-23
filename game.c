@@ -33,10 +33,17 @@ void game_loop()
 	
 	while (1)
 	{
+		if(game_state == PAUSE)
+		{
+			while(!input_queue) delay_ms(500/TICK_RATE);
+			game_unpause();
+		}
+		
 		if (game_state == LEVEL)
 		{
 			if (input_queue)
 			{
+				
 				if (input_queue & INPUT_SHOOT) player_shoot();
 				if (input_queue & INPUT_LEFT) move_player(LEFT);
 					else if (input_queue & INPUT_RIGHT) move_player(RIGHT);
@@ -220,20 +227,23 @@ void queue_input(enum input_type input)
 	else input_queue = input_queue | input;
 }
 
+
 void game_pause()
 {
-	game_state = PAUSE;
 	input_queue = 0;
+	game_state = PAUSE;
 	ssd1331_clear_screen(BLUE);
 	ssd1331_display_string(0, 20, "SCORE:", FONT_1206, WHITE);
 	ssd1331_num(30, 40, score, 0, FONT_1206, WHITE);
-	while(!input_queue)
-	{
-		delay_ms(500/TICK_RATE);
-	}
+}
+
+void game_unpause()
+{
+	input_queue = 0;
 	ssd1331_clear_screen(BLUE);
 	game_state = LEVEL;
 	render_entities();
 	delay_ms(250);
 }
+
 
