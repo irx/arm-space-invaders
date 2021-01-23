@@ -6,7 +6,7 @@
 enum entity_type{ PLAYER, INVADER, SAUCER, MISSILE_GOOD, MISSILE_BAD };
 enum state{ MENU, PAUSE, LEVEL };
 enum direction{ LEFT, RIGHT};
-enum input_type{ INPUT_LEFT=1, INPUT_RIGHT=2, INPUT_SHOOT=4};
+enum input_type{ INPUT_LEFT=1, INPUT_RIGHT=2, INPUT_SHOOT=4, INPUT_PAUSE=8};
 
 extern enum state game_state;
 
@@ -21,3 +21,4 @@ void delay_ms(int);
 void player_shoot(void);
 void invader_shoot(Entity *e);
 void queue_input(enum input_type input);
+void game_pause(void);

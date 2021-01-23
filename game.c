@@ -216,5 +216,24 @@ void delay_ms( int n)
 
 void queue_input(enum input_type input)
 {
-	input_queue = input_queue | input;
+	if ((input == INPUT_PAUSE) && (game_state == LEVEL)) game_pause();
+	else input_queue = input_queue | input;
 }
+
+void game_pause()
+{
+	game_state = PAUSE;
+	input_queue = 0;
+	ssd1331_clear_screen(BLUE);
+	ssd1331_display_string(0, 20, "SCORE:", FONT_1206, WHITE);
+	ssd1331_num(30, 40, score, 0, FONT_1206, WHITE);
+	while(!input_queue)
+	{
+		delay_ms(500/TICK_RATE);
+	}
+	ssd1331_clear_screen(BLUE);
+	game_state = LEVEL;
+	render_entities();
+	delay_ms(250);
+}
+

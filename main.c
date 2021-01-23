@@ -84,5 +84,8 @@ handle_input(char c)
 	case ' ':
 		queue_input(INPUT_SHOOT);
 		break;
+	case 'p':
+		queue_input(INPUT_PAUSE);
+		break;
 	}
 }
