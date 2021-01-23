@@ -18,6 +18,7 @@ static uint8_t projectile_count=0;
 static uint8_t input_queue = 0;
 static uint8_t saucer_timer = 255;
 static uint8_t speedup_timer = TICKS_PER_SPEEDUP;
+static uint8_t pending_render=0;
 enum state game_state = MENU;
 
 void game_loop()
@@ -52,7 +53,7 @@ void game_loop()
 			move_projectiles();
 		}
 		
-		render_entities();
+		if (pending_render) { render_entities(); pending_render=0;}
 		delay_ms((int)(1000/TICK_RATE));
 	}
 
@@ -86,6 +87,7 @@ void init_level(uint8_t x, uint8_t y)
 		}
 	}
 	game_state = LEVEL;
+	render_entities();
 }
 
 
@@ -125,42 +127,47 @@ void move_invaders()
 		if (dir_swap){ invaders_dir = (invaders_dir+1)%2; move_down = 1;}
 		else move_down = 0;
 	}
+	pending_render=1;
 }
 void move_projectiles()
 {
 	Entity *i = player; //bullet pointer
 	Entity *j = player; //scanned entities pointer
-	while ((i->next != NULL) && projectile_count)
+	if (projectile_count)
 	{
-		i = i->next;
-		if (i->type == MISSILE_GOOD)
+	while ((i->next != NULL) && projectile_count)
 		{
-			--(i->y);
-			while (j->next != NULL) //scanning entities for hit
+			i = i->next;
+			if (i->type == MISSILE_GOOD)
 			{
-				j = j->next;
-				if ((j->type == INVADER) && ((i->x)+(i->sprite[0]->w)-2 > (j->x)) && ((i->x)+1 < (j->x)+(j->sprite[0]->w)-1) && ((i->y) == (j->y)+(j->sprite[0]->h)-1) )
+				--(i->y);
+				while (j->next != NULL) //scanning entities for hit
 				{
-					score+=10;
-					--projectile_count;
-					delete_entity(i);
-					delete_entity(j);
-					if (++kill_count == 20)
+					j = j->next;
+					if ((j->type == INVADER) && ((i->x)+(i->sprite[0]->w)-2 > (j->x)) && ((i->x)+1 < (j->x)+(j->sprite[0]->w)-1) && ((i->y) == (j->y)+(j->sprite[0]->h)-1) )
 					{
-						kill_count = 0;
-						init_level(player->x,player->y);
+						score+=10;
+						--projectile_count;
+						delete_entity(i);
+						delete_entity(j);
+						if (++kill_count == 20)
+						{
+							kill_count = 0;
+							init_level(player->x,player->y);
+						}
+						break;
 					}
-					break;
+					else if ((i->y) == 0) delete_entity(i); //projectile out of bonds
 				}
-				else if ((i->y) == 0) delete_entity(i); //projectile out of bonds
+			}
+			else if(i->type == MISSILE_BAD)
+			{
+				++(i->y);
+				if ( ((i->y) == 59) && ((i->x)+(i->sprite[0]->w)-2 > (player->x)) && ((i->x)+1 < (player->x)+(player->sprite[0]->w)-1) ) //player hit
+					player_hit();
 			}
 		}
-		else if(i->type == MISSILE_BAD)
-		{
-			++(i->y);
-			if ( ((i->y) == 59) && ((i->x)+(i->sprite[0]->w)-2 > (player->x)) && ((i->x)+1 < (player->x)+(player->sprite[0]->w)-1) ) //player hit
-				player_hit();
-		}
+		pending_render=1;
 	}
 }
 void move_player(enum direction dir)
@@ -169,7 +176,9 @@ void move_player(enum direction dir)
 	{
 		if (dir) ++(player->x);
 		else --(player->x);
+		draw_sprite(player->sprite[player->frame], player->x, player->y);
 	}
+	
 }
 
 void player_shoot()

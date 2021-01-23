@@ -1,4 +1,4 @@
-#define TICK_RATE 25
+#define TICK_RATE 50
 #define SPRITES_TOTAL 11
 #define SHOOT_COOLDOWN 15
 #define TICKS_PER_SPEEDUP 20
