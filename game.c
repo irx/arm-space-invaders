@@ -152,7 +152,7 @@ void move_projectiles()
 					score+=10;
 					delete_entity(i);
 					delete_entity(j);
-					if (++kill_count == 15)
+					if (++kill_count == 20)
 					{
 						kill_count = 0;
 						init_level(player->x,player->y);
