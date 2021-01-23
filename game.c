@@ -25,18 +25,19 @@ void game_loop()
 	uint8_t ticks_till_move = (uint8_t)(2 + TICK_RATE);// formula: (uint8_t)(2 + TICK_RATE - level_speed*TICK_RATE/32)
 	init_level(42,54);
 	
-	if (input_queue)
-	{
-		if (input_queue & INPUT_SHOOT) player_shoot();
-		if (input_queue & INPUT_LEFT) move_player(LEFT);
-		else if (input_queue & INPUT_RIGHT) move_player(RIGHT);
-		input_queue = 0;
-	}
+	
 	
 	while (1)
 	{
 		if (game_state == LEVEL)
 		{
+			if (input_queue)
+			{
+				if (input_queue & INPUT_SHOOT) player_shoot();
+				if (input_queue & INPUT_LEFT) move_player(LEFT);
+				else if (input_queue & INPUT_RIGHT) move_player(RIGHT);
+				input_queue = 0;
+			}
 			if (!(--ticks_till_move))
 			{
 				move_invaders();
@@ -197,6 +198,7 @@ void invader_shoot(Entity *e)
 void player_hit()
 {
 	if (!(--lives)) game_over();
+	if ( player->frame != 3) ++(player->frame);
 	//else do some player hit stuff like changing sprites
 
 }
