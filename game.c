@@ -16,6 +16,8 @@ static uint8_t level_speed = 6; //default 1, max 30, temp 6 for tests
 static uint16_t score = 0;
 static uint16_t high_score = 0;
 static uint8_t lives = 3;
+static uint8_t cooldown=0;
+static uint8_t kill_count=0;
 enum state game_state = MENU;
 
 void game_loop()
@@ -23,7 +25,7 @@ void game_loop()
 
 	score = 0;
 	uint8_t ticks_till_move = (uint8_t)(2 + TICK_RATE);// formula: (uint8_t)(2 + TICK_RATE - level_speed*TICK_RATE/32)
-	init_level();
+	init_level(42,54);
 	while (1)
 	{
 		if (game_state == LEVEL)
@@ -33,6 +35,7 @@ void game_loop()
 				move_invaders();
 				ticks_till_move = (uint8_t)(2 + TICK_RATE - level_speed*TICK_RATE/32);
 			}
+			if (cooldown) --cooldown;
 			move_projectiles();
 		}
 		
@@ -43,14 +46,14 @@ void game_loop()
 }
 
 
-void init_level()
+void init_level(uint8_t x, uint8_t y)
 {
 	ssd1331_clear_screen(BLACK);
 	int i, j;
 	lives = 3;
 	invaders_dir = RIGHT;
 	init_entities();
-	player = create_entity(&sprite_player, &sprite_player, 26, 54, INVADER);
+	player = create_entity(&sprite_player, &sprite_player, x, y, INVADER);
 	for (i = 0; i < 4; i++)
 	{
 		for (j = 0; j < 5; j++)
@@ -79,7 +82,8 @@ void game_over()
 	//gonna display score and wait for any input to restart the game
 	//show score, compare score and current highscore
 	delay_ms(2000);
-	init_level();
+	level_speed = 6;
+	init_level(42,54);
 	
 }
 
@@ -94,12 +98,15 @@ void move_invaders()
 			if (((i->x == 0) && !invaders_dir) || ((i->x == 82) && invaders_dir)) //checking if direction swap takes place
 			{
 				i = player;
+				if (level_speed<31) ++level_speed;
 				while (i->next != NULL) //moving invaders down
 				{
 					i = i->next;
-					++(i->y);
-					if ((i->y)>41) game_over();
-					if (level_speed<31) ++level_speed;
+					if (i->type == INVADER)
+					{
+						++(i->y);
+						if ((i->y)>43) game_over();
+					}
 				}
 				invaders_dir = (invaders_dir+1)%2;
 				break;
@@ -131,11 +138,16 @@ void move_projectiles()
 			while (j->next != NULL) //scanning entities for hit
 			{
 				j = j->next;
-				if ( ((i->x)+(i->sprite[0]->w)-2 > (j->x)) && ((i->x)+1 < (j->x)+(j->sprite[0]->w)-1) && ((i->y) == (j->y)+(j->sprite[0]->h)-1) )
+				if ((j->type == INVADER) && ((i->x)+(i->sprite[0]->w)-2 > (j->x)) && ((i->x)+1 < (j->x)+(j->sprite[0]->w)-1) && ((i->y) == (j->y)+(j->sprite[0]->h)-1) )
 				{
 					score+=10;
 					delete_entity(i);
 					delete_entity(j);
+					if (++kill_count == 15)
+					{
+						kill_count = 0;
+						init_level(player->x,player->y);
+					}
 					break;
 				}
 				else if ((i->y) == 0) delete_entity(i); //projectile out of bonds
@@ -160,9 +172,12 @@ void move_player(enum direction dir)
 
 void player_shoot()
 {
+	if (!cooldown)
+	{
 	create_entity(bullet1, bullet1, (player->x)+(player->sprite[0]->w)/2, 55-(bullet1->h), MISSILE_GOOD);
+	cooldown = SHOOT_COOLDOWN;
+	}
 }
-
 void invader_shoot(Entity *e)
 {
 	create_entity(bullet2, bullet2, (e->x)+(e->sprite[0]->w)/2, (e->y)+1, MISSILE_BAD);
