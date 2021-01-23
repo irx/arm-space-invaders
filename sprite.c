@@ -59,8 +59,8 @@ init_sprites(void)
 	sprite_invader3_alt.h = 10;
 
 	sprite_invader4.data = (uint16_t *)sprite_invader4_data;
-	sprite_invader4.w = 18;
-	sprite_invader4.h = 9;
+	sprite_invader4.w = 20;
+	sprite_invader4.h = 7;
 
 	sprite_logo.data = (uint16_t *)sprite_logo_data;
 	sprite_logo.w = 96;
