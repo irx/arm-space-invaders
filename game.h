@@ -1,7 +1,7 @@
 #define TICK_RATE 25
 #define SPRITES_TOTAL 11
 #define SHOOT_COOLDOWN 15
-
+#define TICKS_PER_SPEEDUP 20
 
 enum entity_type{ PLAYER, INVADER, SAUCER, MISSILE_GOOD, MISSILE_BAD };
 enum state{ MENU, PAUSE, LEVEL };

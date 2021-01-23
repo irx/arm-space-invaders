@@ -16,6 +16,7 @@ static uint8_t cooldown=0;
 static uint8_t kill_count=0;
 static uint8_t input_queue = 0;
 static uint8_t saucer_timer = 255;
+static uint8_t speedup_timer = TICKS_PER_SPEEDUP;
 enum state game_state = MENU;
 
 void game_loop()
@@ -35,14 +36,16 @@ void game_loop()
 			{
 				if (input_queue & INPUT_SHOOT) player_shoot();
 				if (input_queue & INPUT_LEFT) move_player(LEFT);
-				else if (input_queue & INPUT_RIGHT) move_player(RIGHT);
+					else if (input_queue & INPUT_RIGHT) move_player(RIGHT);
 				input_queue = 0;
 			}
 			if (!(--ticks_till_move))
 			{
 				move_invaders();
-				ticks_till_move = (uint8_t)(2 + TICK_RATE - level_speed*TICK_RATE/32);
+				ticks_till_move = (uint8_t)(2 + TICK_RATE/2 - level_speed*TICK_RATE/40);
 			}
+			if (speedup_timer) --speedup_timer;
+				else { ++level_speed; speedup_timer = TICKS_PER_SPEEDUP; }
 			if (cooldown) --cooldown;
 			move_projectiles();
 		}
@@ -107,7 +110,6 @@ void move_invaders()
 			if (((i->x == 0) && !invaders_dir) || ((i->x == 82) && invaders_dir)) //checking if direction swap takes place
 			{
 				i = player;
-				if (level_speed<31) ++level_speed;
 				while (i->next != NULL) //moving invaders down
 				{
 					i = i->next;
