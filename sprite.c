@@ -128,15 +128,15 @@ init_sprites(void)
 	/* saucer */
 	sprite_saucer.data = (uint16_t *)sprite_saucer_data;
 	sprite_saucer.w = 18;
-	sprite_saucer.h = 15;
+	sprite_saucer.h = 5;
 
 	sprite_saucer_alt.data = (uint16_t *)sprite_saucer_alt_data;
 	sprite_saucer_alt.w = 18;
-	sprite_saucer_alt.h = 15;
+	sprite_saucer_alt.h = 5;
 
 	sprite_saucer_death.data = (uint16_t *)sprite_saucer_death_data;
 	sprite_saucer_death.w = 18;
-	sprite_saucer_death.h = 15;
+	sprite_saucer_death.h = 5;
 
 	sprite_shield.data = (uint16_t *)sprite_shield_data;
 	sprite_shield.w = 16;
