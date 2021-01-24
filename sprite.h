@@ -15,6 +15,9 @@ typedef struct {
 } Sprite;
 
 
+extern Sprite	sprite_bar1;
+extern Sprite	sprite_bar2;
+extern Sprite	sprite_bar3;
 extern Sprite	sprite_laser1;
 extern Sprite	sprite_laser1_alt;
 extern Sprite	sprite_laser2;
