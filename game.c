@@ -28,7 +28,7 @@ static uint8_t boss_lives = 6;
 static uint8_t boss_cooldown = 150;
 static uint8_t boss_iframes = 0;
 //static uint8_t shield;
-	 
+
 
 enum state game_state = MENU;
 
@@ -41,15 +41,15 @@ void game_loop()
 		while (k->next != NULL)
 		{
 			k = k->next;
-			if (k->type == INVADER) 
+			if (k->type == INVADER)
 			{
 				kill_entity(k);
 				if (kill_count == 0) break;
 			}
 		}
 	#endif
-		
-	
+
+
 	while (1)
 	{
 		if (game_state == LEVEL)
@@ -60,9 +60,9 @@ void game_loop()
 				while (k->next != NULL)
 				{
 					k = k->next;
-					if (k->val > 1) 
+					if (k->val > 1)
 					{
-						if (--(k->val) == 1) 
+						if (--(k->val) == 1)
 						{
 							kill_entity(k);
 							if (!(--pending_kill)) break;
@@ -70,7 +70,7 @@ void game_loop()
 					}
 				}
 			}
-			
+
 			if (input_queue) //input check
 			{
 				if (input_queue & INPUT_SHOOT) player_shoot();
@@ -79,7 +79,7 @@ void game_loop()
 				if (input_queue & INPUT_PAUSE) game_pause();
 				input_queue = 0;
 			}
-			
+
 			if (!boss) //normal level stuff
 			{
 				if (!(--ticks_till_move))
@@ -102,12 +102,12 @@ void game_loop()
 					saucer_shoot();
 				}
 			}
-			
+
 			if (animation_cooldown) --animation_cooldown;
 			if (cooldown) --cooldown;
 			move_projectiles();
 		}
-		
+
 		if (pending_render) { render_entities(); pending_render=0; render_projectiles = 0;}
 		else if (render_projectiles)
 		{
@@ -115,7 +115,7 @@ void game_loop()
 			while (k->next != NULL)
 			{
 				k = k->next;
-				if ((k->type == MISSILE_GOOD) || (k->type == MISSILE_BAD)) 
+				if ((k->type == MISSILE_GOOD) || (k->type == MISSILE_BAD))
 				{
 					render_entity(k);
 				}
@@ -135,7 +135,7 @@ void init_level(uint8_t x, uint8_t y)
 	lives = 3;
 	invaders_dir = RIGHT;
 	init_entities();
-	player = create_entity(&sprite_player_g, &sprite_player_y, &sprite_player_r, x, y, PLAYER); 
+	player = create_entity(&sprite_player_g, &sprite_player_y, &sprite_player_r, x, y, PLAYER);
 	for (i = 0; i < 4; i++)
 	{
 		for (j = 0; j < 5; j++)
@@ -160,7 +160,8 @@ void init_level(uint8_t x, uint8_t y)
 
 void game_over()
 {
-	input_queue = 0;
+	char buf[8];
+
 	game_state = PAUSE;
 	delete_entity(player);
 	render_entities();
@@ -172,16 +173,16 @@ void game_over()
 		high_score = score;
 	}
 	else ssd1331_display_string(16, 8, "SCORE:", FONT_1608, GREEN);
-	//ssd1331_display_num(24, 32, score, 4, FONT_1608, WHITE);
+	ssd1331_display_string(24, 32, u16toa(buf, 8, score), FONT_1608, WHITE);
 	ssd1331_display_string(10, 52, "Press any key", FONT_1206, WHITE);
-	
+
 	while (!input_queue) delay_ms(500/TICK_RATE);
 	input_queue = 0;
-	
+
 	score = 0;
 	level_speed = 1;
 	game_menu();
-	
+
 }
 
 void move_invaders()
@@ -189,20 +190,20 @@ void move_invaders()
 	Entity *i = player;
 	static uint8_t dir_swap = 0;
 	static uint8_t move_down = 0;
-				
+
 	i = player;
 	while (i->next != NULL) //moving left|right
 	{
 		i = i->next;
 		if (i->type == INVADER)
 		{
-			if (move_down)		
+			if (move_down)
 			{
 				++(i->y);
 				if ((i->y)>43) game_over();
 			}
 			else if (((i->x == 1) && !invaders_dir) || ((i->x == 81) && invaders_dir)) dir_swap = 1; //checking if direction swap takes place
-			
+
 			if (!animation_cooldown && i->frame != 2) // animate 'em!
 				{
 					i->frame = ((i->frame)+1)%2;
@@ -237,7 +238,7 @@ void move_projectiles()
 						saucer_hit();
 					}
 				}
-				else 
+				else
 				{
 					while (j->next != NULL) //scanning entities for hit
 					{
@@ -278,7 +279,7 @@ void move_player(enum direction dir)
 		else --(player->x);
 		draw_sprite(player->sprite[player->frame], player->x, player->y);
 	}
-	
+
 }
 
 void player_shoot()
@@ -288,17 +289,17 @@ void player_shoot()
 		++projectile_count;
 		create_entity(&sprite_laser2, &sprite_laser2_alt, &sprite_laser2_alt, (player->x)+(player->sprite[0]->w)/2, 55-(sprite_laser2.h), MISSILE_GOOD);
 		cooldown = SHOOT_COOLDOWN;
-		
+
 	}
 }
 void saucer_shoot()
 {
 	static enum direction alternate = RIGHT; //fire from alternating sides
 	create_entity(&sprite_laser1, &sprite_laser1_alt, &sprite_laser1_alt, (saucer->x)+2+alternate*12, (saucer->y)+6, MISSILE_BAD);
-}	
+}
 void saucer_hit()
 {
-	
+
 }
 
 
@@ -326,14 +327,16 @@ void queue_input(enum input_type input)
 
 void game_pause()
 {
+	char buf[8];
+
 	input_queue = 0;
 	game_state = PAUSE;
 	ssd1331_clear_screen(BLUE);
-	
+
 	ssd1331_display_string(16, 8, "SCORE:", FONT_1608, WHITE);
-	//ssd1331_display_num(24, 32, score, 4, FONT_1608, WHITE);
+	ssd1331_display_string(24, 32, u16toa(buf, 8, score), FONT_1608, WHITE);
 	ssd1331_display_string(10, 52, "Press any key", FONT_1206, WHITE);
-	
+
 	while(!input_queue) delay_ms(500/TICK_RATE);
 	input_queue = 0;
 	ssd1331_clear_screen(BLACK);
@@ -398,7 +401,7 @@ void kill_entity(Entity *e)
 			{
 				kill_count = 0;
 				boss_fight();
-			}					
+			}
 		}
 		else if (e->type == SHIELD)
 		{
@@ -408,5 +411,3 @@ void kill_entity(Entity *e)
 	else { (e->frame)=2; (e->val)=15; ++pending_kill;}
 	pending_render = 1;
 }
-
-

@@ -41,3 +41,4 @@ extern Sprite	sprite_shield_death;
 
 void		init_sprites(void);
 void		draw_clear_sprite(uint8_t, const Sprite *, uint8_t, uint8_t);
+char		*u16toa(char *, unsigned int, uint16_t);
