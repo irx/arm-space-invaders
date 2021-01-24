@@ -236,7 +236,7 @@ void game_pause()
 	game_state = PAUSE;
 	ssd1331_clear_screen(BLUE);
 	ssd1331_display_string(0, 20, "SCORE:", FONT_1206, WHITE);
-	ssd1331_num(30, 40, score, 0, FONT_1206, WHITE);
+	//ssd1331_num(30, 40, score, 0, FONT_1206, WHITE);
 	
 	while(!input_queue) delay_ms(500/TICK_RATE);
 
