@@ -69,7 +69,6 @@ void game_loop()
 			
 			if (!boss) //normal level stuff
 			{
-				if (animation_cooldown) --animation_cooldown;
 				if (!(--ticks_till_move))
 				{
 					move_invaders();
@@ -80,8 +79,6 @@ void game_loop()
 						if (speedup_timer) --speedup_timer;
 							else {  ++level_speed; speedup_timer = TICKS_PER_SPEEDUP; }
 					}
-				if (cooldown) --cooldown;
-				move_projectiles();
 			}
 			else //boss fight stuff
 			{
@@ -93,6 +90,9 @@ void game_loop()
 				}
 			}
 			
+			if (animation_cooldown) --animation_cooldown;
+			if (cooldown) --cooldown;
+			move_projectiles();
 		}
 		
 		if (pending_render) { render_entities(); pending_render=0;}
@@ -217,6 +217,7 @@ void move_projectiles()
 						{
 							--projectile_count;
 							kill_entity(j);
+							pending_render=1;
 						}
 						if ((j->type == INVADER) && ((i->x)+(i->sprite[0]->w)-2 > (j->x)) && ((i->x)+1 < (j->x)+(j->sprite[0]->w)-1) && (((i->y) == (j->y)+(j->sprite[0]->h)-1) || ((i->y) == (j->y)+(j->sprite[0]->h)-2)) )
 						{
@@ -224,6 +225,7 @@ void move_projectiles()
 							--projectile_count;
 							delete_entity(i);
 							if (!(j->val)) kill_entity(j);
+							pending_render=1;
 							break;
 						}
 						else if ((i->y) == 0) delete_entity(i); //projectile out of bonds
@@ -258,6 +260,7 @@ void player_shoot()
 		++projectile_count;
 		create_entity(&sprite_laser2, &sprite_laser2_alt, &sprite_laser2_alt, (player->x)+(player->sprite[0]->w)/2, 55-(sprite_laser2.h), MISSILE_GOOD);
 		cooldown = SHOOT_COOLDOWN;
+		
 	}
 }
 void saucer_shoot()
@@ -371,7 +374,7 @@ void kill_entity(Entity *e)
 			delete_entity(e);
 		}
 	}
-	else { (e->frame)=2; (e->val)=11; ++pending_kill;}
+	else { (e->frame)=2; (e->val)=15; ++pending_kill;}
 	pending_render = 1;
 }
 
