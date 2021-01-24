@@ -143,7 +143,7 @@ void game_over()
 	//ssd1331_display_num(24, 32, score, 4, FONT_1608, WHITE);
 	ssd1331_display_string(10, 52, "Press any key", FONT_1206, WHITE);
 	
-	while (!input_queue) delay_ms(500);
+	while (!input_queue) delay_ms(500/TICK_RATE);
 	input_queue = 0;
 	
 	score = 0;
@@ -300,7 +300,7 @@ void game_pause()
 	//ssd1331_display_num(24, 32, score, 4, FONT_1608, WHITE);
 	ssd1331_display_string(10, 52, "Press any key", FONT_1206, WHITE);
 	
-	while(!input_queue) delay_ms(500);
+	while(!input_queue) delay_ms(500/TICK_RATE);
 	input_queue = 0;
 	ssd1331_clear_screen(BLACK);
 	game_state = LEVEL;
@@ -344,7 +344,7 @@ void game_menu()
 	ssd1331_display_string(9, 0, "Space", FONT_1608, GREEN);
 	ssd1331_display_string(32, 16, "Invaders", FONT_1608, GREEN);
 	ssd1331_display_string(10, 52, "Press any key", FONT_1206, WHITE);
-	while (!input_queue) delay_ms(500);
+	while (!input_queue) delay_ms(500/TICK_RATE);
 	input_queue = 0;
 	init_level(42,54);
 }
