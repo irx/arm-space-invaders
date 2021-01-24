@@ -42,6 +42,7 @@ create_entity(const Sprite *spr, const Sprite *alt, const Sprite *alt2, uint8_t 
 	entity_buf[i].frame = 0;
 	entity_buf[i].x = x;
 	entity_buf[i].y = y;
+	entity_buf[i].val = 0;
 	entity_buf[i].sprite[0] = (Sprite *)spr;
 	entity_buf[i].sprite[1] = (Sprite *)alt;
 	entity_buf[i].sprite[2] = (Sprite *)alt2;
