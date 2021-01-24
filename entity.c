@@ -24,7 +24,10 @@ init_entities(void)
 {
 	int i;
 	for (i = 0; i < ENTITY_CNT; ++i)
+	{
 		entity_buf[i].exists = 0;
+		entity_buf[i].val = 0;
+	}
 	entity_first = NULL;
 	entity_last = NULL;
 }
@@ -72,6 +75,7 @@ delete_entity(Entity *e)
 	if (e == entity_last)
 		entity_last = e->prev;
 	e->exists = 0;
+	e->val = 0;
 }
 
 void

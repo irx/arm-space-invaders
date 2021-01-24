@@ -47,14 +47,15 @@ void game_loop()
 				while (k->next != NULL)
 				{
 					k = k->next;
-					if (k->frame == 2) 
-						{
-							kill_entity(k);
-							if (!(--pending_kill)) break;
-						}
+					if (k->val > 1) 
+					{
+						if (--(k->val) == 1) kill_entity(k);
+						if (!(--pending_kill)) break;
+					}
 				}
 			}
-			if (input_queue)
+			
+			if (input_queue) //input check
 			{
 				if (input_queue & INPUT_SHOOT) player_shoot();
 				if (input_queue & INPUT_LEFT) move_player(LEFT);
@@ -82,7 +83,7 @@ void game_loop()
 			else //boss fight stuff
 			{
 				move_saucer();
-				if (!(--boss_cooldown))
+				if (!(--boss_cooldown)) //saucer shooting
 				{
 					boss_cooldown = 100-(level_speed/2);
 					saucer_shoot();
@@ -133,10 +134,10 @@ void game_over()
 	game_state = PAUSE;
 	delete_entity(player);
 	delay_ms(1000);
-	
+	ssd1331_clear_screen(BLACK);
 	if (score>high_score)
 	{
-		ssd1331_display_string(8, 8, "NEW HIGHSCORE:", FONT_1608, RED);
+		ssd1331_display_string(0, 8, "NEW HIGHSCORE", FONT_1608, RED);
 		high_score = score;
 	}
 	else ssd1331_display_string(16, 8, "SCORE:", FONT_1608, GREEN);
@@ -171,7 +172,7 @@ void move_invaders()
 			}
 			else if (((i->x == 1) && !invaders_dir) || ((i->x == 81) && invaders_dir)) dir_swap = 1; //checking if direction swap takes place
 			
-			if (!animation_cooldown && i->frame != 3) // animate 'em!
+			if (!animation_cooldown && i->frame != 2) // animate 'em!
 				{
 					i->frame = ((i->frame)+1)%2;
 				}
@@ -234,7 +235,6 @@ void move_projectiles()
 					player_hit();
 			}
 		}
-		pending_render=1;
 	}
 }
 void move_player(enum direction dir)
@@ -351,7 +351,7 @@ void game_menu()
 
 void kill_entity(Entity *e)
 {
-	if (e->frame == 2)
+	if ((e->val)==1)
 	{
 		if (e->type == INVADER)
 		{
@@ -368,7 +368,8 @@ void kill_entity(Entity *e)
 			delete_entity(e);
 		}
 	}
-	else { (e->frame)=2; ++pending_kill;}
+	else { (e->frame)=2; (e->val)=11; ++pending_kill;}
+	pending_render = 1;
 }
 
 
