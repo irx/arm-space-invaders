@@ -25,7 +25,7 @@ static uint8_t animation_cooldown=5;
 
 static uint8_t boss=0;
 static uint8_t boss_lives = 6;
-static uint8_t boss_cooldown = 100;
+static uint8_t boss_cooldown = 150;
 static uint8_t boss_iframes = 0;
 //static uint8_t shield;
 	 
@@ -98,7 +98,7 @@ void game_loop()
 				move_saucer();
 				if (!(--boss_cooldown)) //saucer shooting
 				{
-					boss_cooldown = 100-(level_speed/3);
+					boss_cooldown = 165-(level_speed/2);
 					saucer_shoot();
 				}
 			}
@@ -115,7 +115,7 @@ void game_loop()
 			while (k->next != NULL)
 			{
 				k = k->next;
-				if (k->type == MISSILE_GOOD || k->type == MISSILE_BAD) 
+				if ((k->type == MISSILE_GOOD) || (k->type == MISSILE_BAD)) 
 				{
 					render_entity(k);
 				}
@@ -160,8 +160,10 @@ void init_level(uint8_t x, uint8_t y)
 
 void game_over()
 {
+	input_queue = 0;
 	game_state = PAUSE;
 	delete_entity(player);
+	render_entities();
 	delay_ms(1000);
 	ssd1331_clear_screen(BLACK);
 	if (score>high_score)
