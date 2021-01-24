@@ -165,7 +165,7 @@ u16toa(char *dst, unsigned int len, uint16_t src)
 		div *= 10;
 	i = -1;
 	if (!src)
-		dst[++i];
+		dst[++i] = 48;
 	while (++i < len && src > 0) {
 		div /= 10;
 		dig = src / div;
