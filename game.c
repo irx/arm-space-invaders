@@ -20,6 +20,7 @@ static uint8_t pending_kill = 0;
 
 static uint8_t speedup_timer = TICKS_PER_SPEEDUP;
 static uint8_t pending_render=0;
+static uint8_t render_projectiles=0;
 static uint8_t animation_cooldown=5;
 
 static uint8_t boss=0;
@@ -95,7 +96,20 @@ void game_loop()
 			move_projectiles();
 		}
 		
-		if (pending_render) { render_entities(); pending_render=0;}
+		if (pending_render) { render_entities(); pending_render=0; render_projectiles = 0;}
+		else if (render_projectiles)
+		{
+			k = player;
+			while (k->next != NULL)
+			{
+				k = k->next;
+				if (k->type == MISSILE_GOOD || k->type == MISSILE_BAD) 
+				{
+					render_entity(k);
+				}
+			}
+			render_projectiles = 0;
+		}
 		delay_ms((int)(1000/TICK_RATE));
 	}
 
@@ -217,7 +231,7 @@ void move_projectiles()
 						{
 							--projectile_count;
 							kill_entity(j);
-							pending_render=1;
+							render_projectiles=1;
 						}
 						if ((j->type == INVADER) && ((i->x)+(i->sprite[0]->w)-2 > (j->x)) && ((i->x)+1 < (j->x)+(j->sprite[0]->w)-1) && (((i->y) == (j->y)+(j->sprite[0]->h)-1) || ((i->y) == (j->y)+(j->sprite[0]->h)-2)) )
 						{
@@ -225,7 +239,7 @@ void move_projectiles()
 							--projectile_count;
 							delete_entity(i);
 							if (!(j->val)) kill_entity(j);
-							pending_render=1;
+							render_projectiles=1;
 							break;
 						}
 						else if ((i->y) == 0) delete_entity(i); //projectile out of bonds

@@ -16,3 +16,4 @@ void			init_entities(void);
 Entity			*create_entity(const Sprite *, const Sprite *, const Sprite *, uint8_t, uint8_t, uint8_t);
 void			delete_entity(Entity *);
 void			render_entities(void);
+Entity			*render_entity(Entity *e);

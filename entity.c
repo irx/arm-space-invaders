@@ -87,3 +87,8 @@ render_entities(void)
 		e = e->next;
 	}
 }
+Entity *
+render_entity(Entity *e)
+{
+	draw_sprite(e->sprite[e->frame], e->x, e->y);
+}
