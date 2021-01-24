@@ -12,14 +12,15 @@ static uint8_t level_speed = 6; //default 1, max 45, temp 6 for tests
 static uint16_t score = 0;
 static uint16_t high_score = 0;
 static uint8_t lives = 3;
-static uint8_t cooldown=0;
+static uint8_t cooldown=0; //player shooting cooldown
 static uint8_t kill_count=0;
 static uint8_t projectile_count=0;
 static uint8_t input_queue = 0;
-static uint8_t saucer_timer = 255;
+static uint8_t saucer_cooldown = 30;
 static uint8_t speedup_timer = TICKS_PER_SPEEDUP;
 static uint8_t pending_render=0;
 static uint8_t animation_cooldown=5;
+static uint8_t boss=0;
 enum state game_state = MENU;
 
 void game_loop()
@@ -44,19 +45,28 @@ void game_loop()
 				if (input_queue & INPUT_PAUSE) game_pause();
 				input_queue = 0;
 			}
-			if (animation_cooldown) --animation_cooldown;
-			if (!(--ticks_till_move))
+			
+			if (!boss) //normal level stuff
 			{
-				move_invaders();
-				ticks_till_move = (uint8_t)(1 + TICK_RATE - level_speed*TICK_RATE/100);
-			}
-			if (level_speed < 80)
+				if (animation_cooldown) --animation_cooldown;
+				if (!(--ticks_till_move))
 				{
-					if (speedup_timer) --speedup_timer;
-						else {  ++level_speed; speedup_timer = TICKS_PER_SPEEDUP; }
+					move_invaders();
+					ticks_till_move = (uint8_t)(1 + TICK_RATE - level_speed*TICK_RATE/100);
 				}
-			if (cooldown) --cooldown;
-			move_projectiles();
+				if (level_speed < 80)
+					{
+						if (speedup_timer) --speedup_timer;
+							else {  ++level_speed; speedup_timer = TICKS_PER_SPEEDUP; }
+					}
+				if (cooldown) --cooldown;
+				move_projectiles();
+			}
+			else //boss fight stuff
+			{
+				move_saucer();
+			}
+			
 		}
 		
 		if (pending_render) { render_entities(); pending_render=0;}
@@ -205,7 +215,7 @@ void player_shoot()
 		cooldown = SHOOT_COOLDOWN;
 	}
 }
-void invader_shoot(Entity *e)
+void saucer_shoot(Entity *e)
 {
 	create_entity(&sprite_laser1, &sprite_laser1_alt, (e->x)+(e->sprite[0]->w)/2, (e->y)+1, MISSILE_BAD);
 }
@@ -240,7 +250,7 @@ void game_pause()
 	game_state = PAUSE;
 	ssd1331_clear_screen(BLUE);
 	ssd1331_display_string(0, 20, "SCORE:", FONT_1206, WHITE);
-	//ssd1331_num(30, 40, score, 0, FONT_1206, WHITE);
+	//ssd1331_display_num(30, 40, score, 4, FONT_1206, WHITE);
 	
 	while(!input_queue) delay_ms(500/TICK_RATE);
 
@@ -254,9 +264,25 @@ void game_pause()
 
 void boss_fight()
 {
-	
+	delay_ms(60);
+	ssd1331_clear_screen(RED);
+	delay_ms(90);
+	render_entities();
+	delay_ms(130);
+	ssd1331_clear_screen(RED);
+	delay_ms(90);
+	saucer = create_entity(&sprite_invader4,&sprite_invader4,0,1,SAUCER);
+	render_entities();
+	boss=1;
+	//healthbar
 }
 
-
+void move_saucer()
+{
+	static enum direction saucer_dir = RIGHT;
+	if(saucer_dir) ++(saucer->x);
+		else --(saucer->x);
+	if (((saucer->x == 0) && !saucer_dir) || ((saucer->x == 82) && saucer_dir)) saucer_dir =(saucer_dir+1)%2;
+}
 
 
