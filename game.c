@@ -29,10 +29,10 @@ void game_loop()
 	score = 0;
 	uint8_t ticks_till_move = (uint8_t)(1 + TICK_RATE);
 
+	while (!input_queue);
+	input_queue = 0;
 	init_level(42,54);
-	
-	
-	
+
 	while (1)
 	{
 		if (game_state == LEVEL)
