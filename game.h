@@ -15,6 +15,7 @@ void init_level(uint8_t, uint8_t); //player position
 void move_invaders(void);
 void move_player(enum direction dir);
 void game_over(void);
+void game_menu(void);
 void move_projectiles(void);
 void player_hit(void);
 void delay_ms(int);

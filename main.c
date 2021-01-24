@@ -30,10 +30,6 @@ main(void)
 
 	draw_sprite(&sprite_logo, 0, 0);
 	delay_ms(2000);
-	ssd1331_clear_screen(BLACK);
-	ssd1331_display_string(9, 0, "Space", FONT_1608, GREEN);
-	ssd1331_display_string(32, 16, "Invaders", FONT_1608, GREEN);
-	ssd1331_display_string(10, 52, "Press any key", FONT_1206, WHITE);
 
 	game_loop();
 }

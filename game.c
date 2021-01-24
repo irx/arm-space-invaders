@@ -16,7 +16,7 @@ static uint8_t cooldown=0; //player shooting cooldown
 static uint8_t kill_count=0;
 static uint8_t projectile_count=0;
 static uint8_t input_queue = 0;
-static uint8_t saucer_cooldown = 30;
+static uint8_t saucer_cooldown = 100;
 static uint8_t speedup_timer = TICKS_PER_SPEEDUP;
 static uint8_t pending_render=0;
 static uint8_t animation_cooldown=5;
@@ -25,13 +25,9 @@ enum state game_state = MENU;
 
 void game_loop()
 {
-
-	score = 0;
 	uint8_t ticks_till_move = (uint8_t)(1 + TICK_RATE);
-
-	while (!input_queue);
-	input_queue = 0;
-	init_level(42,54);
+	
+	game_menu();
 
 	while (1)
 	{
@@ -65,6 +61,12 @@ void game_loop()
 			else //boss fight stuff
 			{
 				move_saucer();
+				if (!(--saucer_cooldown))
+				{
+
+					saucer_cooldown = 100-(level_speed/2);
+					saucer_shoot;
+				}
 			}
 			
 		}
@@ -111,11 +113,14 @@ void game_over()
 {
 	game_state = PAUSE;
 	delete_entity(player);
+	delay_ms(2000);
 	//gonna display score and wait for any input to restart the game
 	//show score, compare score and current highscore
-	delay_ms(2000);
-	level_speed = 6;
-	init_level(42,54);
+	//wait for button press
+	
+	score = 0;
+	level_speed = 1;
+	game_menu();
 	
 }
 
@@ -167,7 +172,7 @@ void move_projectiles()
 				while (j->next != NULL) //scanning entities for hit
 				{
 					j = j->next;
-					if ((j->type == INVADER) && ((i->x)+(i->sprite[0]->w)-2 > (j->x)) && ((i->x)+1 < (j->x)+(j->sprite[0]->w)-1) && ((i->y) == (j->y)+(j->sprite[0]->h)-1) )
+					if ((j->type == INVADER) && ((i->x)+(i->sprite[0]->w)-2 > (j->x)) && ((i->x)+1 < (j->x)+(j->sprite[0]->w)-1) && (((i->y) == (j->y)+(j->sprite[0]->h)-1) || ((i->y) == (j->y)+(j->sprite[0]->h)-2)) )
 					{
 						score+=10;
 						--projectile_count;
@@ -188,7 +193,7 @@ void move_projectiles()
 			{
 				++(i->y);
 				i->frame = ((i->frame)+1)%2;
-				if ( ((i->y) == 59) && ((i->x)+(i->sprite[0]->w)-2 > (player->x)) && ((i->x)+1 < (player->x)+(player->sprite[0]->w)-1) ) //player hit
+				if ( ((i->y) == 60) && ((i->x)+(i->sprite[0]->w)-2 > (player->x)) && ((i->x)+1 < (player->x)+(player->sprite[0]->w)-1) ) //player hit
 					player_hit();
 			}
 		}
@@ -217,8 +222,9 @@ void player_shoot()
 }
 void saucer_shoot(Entity *e)
 {
-	create_entity(&sprite_laser1, &sprite_laser1_alt, (e->x)+(e->sprite[0]->w)/2, (e->y)+1, MISSILE_BAD);
-}
+	static enum direction alternate = RIGHT; //fire from alternating sides
+	create_entity(&sprite_laser1, &sprite_laser1_alt, (e->x)+2+alternate*12, (e->y)+6, MISSILE_BAD);
+}	
 
 
 
@@ -279,10 +285,27 @@ void boss_fight()
 
 void move_saucer()
 {
+	static uint8_t saucer_timer = 3;
 	static enum direction saucer_dir = RIGHT;
+	if (!(--saucer_timer))
+	{
+		saucer_timer=2+(TICK_RATE/3) - level_speed*TICK_RATE/240;
 	if(saucer_dir) ++(saucer->x);
 		else --(saucer->x);
 	if (((saucer->x == 0) && !saucer_dir) || ((saucer->x == 82) && saucer_dir)) saucer_dir =(saucer_dir+1)%2;
+	}
+}
+
+void game_menu()
+{
+	game_state = MENU;
+	ssd1331_clear_screen(BLACK);
+	ssd1331_display_string(9, 0, "Space", FONT_1608, GREEN);
+	ssd1331_display_string(32, 16, "Invaders", FONT_1608, GREEN);
+	ssd1331_display_string(10, 52, "Press any key", FONT_1206, WHITE);
+	while (!input_queue);
+	input_queue = 0;
+	init_level(42,54);
 }
 
 
