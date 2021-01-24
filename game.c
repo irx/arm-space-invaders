@@ -17,7 +17,7 @@ static uint8_t kill_count=0;
 static uint8_t projectile_count=0;
 static uint8_t input_queue = 0;
 static uint8_t saucer_timer = 255;
-static uint8_t speedup_timer = TICKS_PER_SPEEDUP;
+static uint8_t speedup_timer = TICKS_PER_SPEE	DUP;
 static uint8_t pending_render=0;
 static uint8_t animation_cooldown=5;
 enum state game_state = MENU;
@@ -130,7 +130,6 @@ void move_invaders()
 			if (!animation_cooldown) // animate 'em!
 				{
 					i->frame = ((i->frame)+1)%2;
-					animation_cooldown = 5;
 				}
 			if (invaders_dir) ++(i->x);
 			else --(i->x);
@@ -138,6 +137,7 @@ void move_invaders()
 		if (dir_swap){ invaders_dir = (invaders_dir+1)%2; move_down = 1; dir_swap = 0;}
 		else move_down = 0;
 	}
+	if (!animation_cooldown) animation_cooldown = 5;
 	pending_render=1;
 }
 void move_projectiles()
@@ -152,6 +152,7 @@ void move_projectiles()
 			if (i->type == MISSILE_GOOD)
 			{
 				--(i->y);
+				i->frame = ((i->frame)+1)%2;
 				while (j->next != NULL) //scanning entities for hit
 				{
 					j = j->next;
@@ -174,6 +175,7 @@ void move_projectiles()
 			else if(i->type == MISSILE_BAD)
 			{
 				++(i->y);
+				i->frame = ((i->frame)+1)%2;
 				if ( ((i->y) == 59) && ((i->x)+(i->sprite[0]->w)-2 > (player->x)) && ((i->x)+1 < (player->x)+(player->sprite[0]->w)-1) ) //player hit
 					player_hit();
 			}
