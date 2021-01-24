@@ -28,11 +28,16 @@ extern Sprite	sprite_invader2_death;
 extern Sprite	sprite_invader3;
 extern Sprite	sprite_invader3_alt;
 extern Sprite	sprite_invader3_death;
-extern Sprite	sprite_invader4;
 extern Sprite	sprite_logo;
 extern Sprite	sprite_player_g;
 extern Sprite	sprite_player_y;
 extern Sprite	sprite_player_r;
+extern Sprite	sprite_saucer;
+extern Sprite	sprite_saucer_alt;
+extern Sprite	sprite_saucer_death;
+extern Sprite	sprite_shield;
+extern Sprite	sprite_shield_alt;
+extern Sprite	sprite_shield_death;
 
 void		init_sprites(void);
 void		draw_clear_sprite(uint8_t, const Sprite *, uint8_t, uint8_t);
