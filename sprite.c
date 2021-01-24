@@ -17,6 +17,9 @@
 #include "assets/saucer.h"
 
 
+Sprite				sprite_bar1;
+Sprite				sprite_bar2;
+Sprite				sprite_bar3;
 Sprite				sprite_laser1;
 Sprite				sprite_laser1_alt;
 Sprite				sprite_laser2;
@@ -50,6 +53,19 @@ static const uint8_t		set_row_address = 0x75;
 void
 init_sprites(void)
 {
+	/* health bar */
+	sprite_bar1.data = (uint16_t *)sprite_bar1_data;
+	sprite_bar1.w = 48;
+	sprite_bar1.h = 3;
+
+	sprite_bar2.data = (uint16_t *)sprite_bar2_data;
+	sprite_bar2.w = 48;
+	sprite_bar2.h = 3;
+
+	sprite_bar3.data = (uint16_t *)sprite_bar3_data;
+	sprite_bar3.w = 48;
+	sprite_bar3.h = 3;
+
 	/* laser1 */
 	sprite_laser1.data = (uint16_t *)sprite_laser1_data;
 	sprite_laser1.w = 2;
@@ -166,7 +182,7 @@ u16toa(char *dst, unsigned int len, uint16_t src)
 	i = -1;
 	if (!src)
 		dst[++i] = 48;
-	while (++i < len && src > 0) {
+	while (++i < len && div > 1) {
 		div /= 10;
 		dig = src / div;
 		dst[i] = (char)(dig + 48);
