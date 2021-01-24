@@ -11,13 +11,16 @@
 #include "imgiolib.h"
 
 
-static uint16_t *
-img2u16(const Image *img)
+/**
+ * prints img to stdin in SSD1331 format
+ */
+static void
+img2u16(const Image *img, const char *name)
 {
 	Rgba cp;
 	int i, j, val;
-	uint16_t pix, *buf = (uint16_t *)malloc(sizeof(uint16_t)*img->w*img->h);
-	printf("/* %ldx%ld */\nstatic const uint16_t my_img[] = {\n", img->w, img->h);
+	uint16_t pix;
+	printf("\n/* %ldx%ld */\nstatic const uint16_t sprite_%s_data[] = {\n", img->w, img->h, name);
 	for (i = 0; i < img->h; ++i) {
 		printf("\t");
 		for (j = 0; j < img->w; ++j) {
@@ -28,35 +31,29 @@ img2u16(const Image *img)
 			pix |= val << 9;
 			val = (cp.b * 0x1f) / 0xff;
 			pix |= val;
-			buf[i*img->w+j] = pix;
 			printf("0x%04x", pix);
-			if (j+1 == img->w)
-				printf(",");
-			else
+			if (j+1 != img->w)
 				printf(", ");
 		}
 		if (i+1 == img->h)
-			printf("\n}\n");
+			printf("\n};\n");
 		else
-			printf("\n");
+			printf(",\n");
 	}
-	return buf;
 }
 
 int
 main(int argc, char *argv[])
 {
 	Image *img;
-	uint16_t *buf;
 
-	if (argc < 2) {
-		fprintf(stderr, "usage: %s image.jpg > image.c\n", argv[0]);
+	if (argc < 3) {
+		fprintf(stderr, "usage: %s image.jpg my_sprite > image.c\n", argv[0]);
 		return 1;
 	}
 
 	img = create_image();
 	load_JPEG(img, argv[1]);
-	buf = img2u16(img);
-	free(buf);
+	img2u16(img, argv[2]);
 	return 0;
 }
