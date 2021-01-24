@@ -220,7 +220,7 @@ void move_projectiles()
 
 							--projectile_count;
 							delete_entity(i);
-							kill_entity(j);
+							if (!(j->val)) kill_entity(j);
 							break;
 						}
 						else if ((i->y) == 0) delete_entity(i); //projectile out of bonds
