@@ -16,23 +16,44 @@ static uint8_t cooldown=0; //player shooting cooldown
 static uint8_t kill_count=0;
 static uint8_t projectile_count=0;
 static uint8_t input_queue = 0;
-static uint8_t saucer_cooldown = 100;
+static uint8_t pending_kill = 0;
+
 static uint8_t speedup_timer = TICKS_PER_SPEEDUP;
 static uint8_t pending_render=0;
 static uint8_t animation_cooldown=5;
+
 static uint8_t boss=0;
+static uint8_t boss_lives = 6;
+static uint8_t boss_cooldown = 100;
+static uint8_t boss_iframes = 0;
+//static uint8_t shield;
+
+
 enum state game_state = MENU;
 
 void game_loop()
 {
 	uint8_t ticks_till_move = (uint8_t)(1 + TICK_RATE);
-	
+	Entity *k = player;
 	game_menu();
 
 	while (1)
 	{
 		if (game_state == LEVEL)
 		{
+			if (pending_kill) //death animation cleanup
+			{
+				k = player;
+				while (k->next != NULL)
+				{
+					k = k->next;
+					if (k->frame == 3) 
+						{
+							kill_entity(k);
+							if (!(--pending_kill)) break;
+						}
+				}
+			}
 			if (input_queue)
 			{
 				if (input_queue & INPUT_SHOOT) player_shoot();
@@ -61,11 +82,10 @@ void game_loop()
 			else //boss fight stuff
 			{
 				move_saucer();
-				if (!(--saucer_cooldown))
+				if (!(--boss_cooldown))
 				{
-
-					saucer_cooldown = 100-(level_speed/2);
-					saucer_shoot;
+					boss_cooldown = 100-(level_speed/2);
+					saucer_shoot();
 				}
 			}
 			
@@ -85,8 +105,7 @@ void init_level(uint8_t x, uint8_t y)
 	lives = 3;
 	invaders_dir = RIGHT;
 	init_entities();
-	player = create_entity(&sprite_player_g, &sprite_player_y, x, y, INVADER);
-	player->sprite[2] = &sprite_player_r;
+	player = create_entity(&sprite_player_g, &sprite_player_y, &sprite_player_r, x, y, PLAYER); 
 	for (i = 0; i < 4; i++)
 	{
 		for (j = 0; j < 5; j++)
@@ -94,13 +113,13 @@ void init_level(uint8_t x, uint8_t y)
 			switch (i)
 			{
 				case 0:
-					create_entity(&sprite_invader2, &sprite_invader2_alt, 2+13*j, 9*i, INVADER);
+					create_entity(&sprite_invader2, &sprite_invader2_alt, &sprite_invader2_death, 2+13*j, 9*i, INVADER);
 					break;
 				case 3:
-					create_entity(&sprite_invader3, &sprite_invader3_alt, 2+13*j, 9*i, INVADER);
+					create_entity(&sprite_invader3, &sprite_invader3_alt, &sprite_invader3_death, 2+13*j, 9*i, INVADER);
 					break;
 				default:
-					create_entity(&sprite_invader, &sprite_invader_alt, 2+13*j, 9*i, INVADER);
+					create_entity(&sprite_invader, &sprite_invader_alt, &sprite_invader_death, 2+13*j, 9*i, INVADER);
 			}
 		}
 	}
@@ -174,28 +193,37 @@ void move_projectiles()
 	while ((i->next != NULL) && projectile_count)
 		{
 			i = i->next;
+			i->frame = ((i->frame)+1)%2;
 			if (i->type == MISSILE_GOOD)
 			{
 				--(i->y);
-				i->frame = ((i->frame)+1)%2;
-				while (j->next != NULL) //scanning entities for hit
+				if((i->y)==4)
 				{
-					j = j->next;
-					if ((j->type == INVADER) && ((i->x)+(i->sprite[0]->w)-2 > (j->x)) && ((i->x)+1 < (j->x)+(j->sprite[0]->w)-1) && (((i->y) == (j->y)+(j->sprite[0]->h)-1) || ((i->y) == (j->y)+(j->sprite[0]->h)-2)) )
+					if (((i->x)+(i->sprite[0]->w)-2 > saucer->x) && ((i->x)+1)<(saucer->x)+(saucer->sprite[0]->w)-1)
 					{
-						score+=10;
-						--projectile_count;
-						delete_entity(i);
-						delete_entity(j);
-						if (++kill_count == 20)
-						{
-							kill_count = 0;
-							boss_fight();
-							//init_level(player->x,player->y);
-						}
-						break;
+						saucer_hit();
 					}
-					else if ((i->y) == 0) delete_entity(i); //projectile out of bonds
+				}
+				else 
+				{
+					while (j->next != NULL) //scanning entities for hit
+					{
+						j = j->next;
+						if((i->y)==8 && (j->type == SHIELD) && ((i->x)+(i->sprite[0]->w)-2 > (j->x)) && ((i->x)+1 < (j->x)+(j->sprite[0]->w)-1))
+						{
+							--projectile_count;
+							kill_entity(j);
+						}
+						if ((j->type == INVADER) && ((i->x)+(i->sprite[0]->w)-2 > (j->x)) && ((i->x)+1 < (j->x)+(j->sprite[0]->w)-1) && (((i->y) == (j->y)+(j->sprite[0]->h)-1) || ((i->y) == (j->y)+(j->sprite[0]->h)-2)) )
+						{
+
+							--projectile_count;
+							delete_entity(i);
+							kill_entity(j);
+							break;
+						}
+						else if ((i->y) == 0) delete_entity(i); //projectile out of bonds
+					}
 				}
 			}
 			else if(i->type == MISSILE_BAD)
@@ -225,16 +253,19 @@ void player_shoot()
 	if (!cooldown)
 	{
 		++projectile_count;
-		create_entity(&sprite_laser2, &sprite_laser2_alt, (player->x)+(player->sprite[0]->w)/2, 55-(sprite_laser2.h), MISSILE_GOOD);
+		create_entity(&sprite_laser2, &sprite_laser2_alt, &sprite_laser2_alt, (player->x)+(player->sprite[0]->w)/2, 55-(sprite_laser2.h), MISSILE_GOOD);
 		cooldown = SHOOT_COOLDOWN;
 	}
 }
-void saucer_shoot(Entity *e)
+void saucer_shoot()
 {
 	static enum direction alternate = RIGHT; //fire from alternating sides
-	create_entity(&sprite_laser1, &sprite_laser1_alt, (e->x)+2+alternate*12, (e->y)+6, MISSILE_BAD);
+	create_entity(&sprite_laser1, &sprite_laser1_alt, &sprite_laser1_alt, (saucer->x)+2+alternate*12, (saucer->y)+6, MISSILE_BAD);
 }	
-
+void saucer_hit()
+{
+	
+}
 
 
 
@@ -287,7 +318,7 @@ void boss_fight()
 	delay_ms(130);
 	ssd1331_clear_screen(RED);
 	delay_ms(90);
-	saucer = create_entity(&sprite_invader4,&sprite_invader4,0,1,SAUCER);
+	saucer = create_entity(&sprite_invader4,&sprite_invader4,&sprite_invader4,0,1,SAUCER);
 	render_entities();
 	boss=1;
 	//healthbar
@@ -316,6 +347,28 @@ void game_menu()
 	while (!input_queue);
 	input_queue = 0;
 	init_level(42,54);
+}
+
+void kill_entity(Entity *e)
+{
+	if (e->frame == 3)
+	{
+		if (e->type == INVADER)
+		{
+			score+=10;
+			delete_entity(e);
+			if (++kill_count == 20)
+			{
+				kill_count = 0;
+				boss_fight();
+			}					
+		}
+		else if (e->type == SHIELD)
+		{
+			delete_entity(e);
+		}
+	}
+	else { (e->frame)=3; ++pending_kill;}
 }
 
 
