@@ -14,6 +14,7 @@
 #include "assets/invader.h"
 #include "assets/logo.h"
 #include "assets/player.h"
+#include "assets/saucer.h"
 
 
 Sprite				sprite_laser1;
@@ -29,11 +30,16 @@ Sprite				sprite_invader2_death;
 Sprite				sprite_invader3;
 Sprite				sprite_invader3_alt;
 Sprite				sprite_invader3_death;
-Sprite				sprite_invader4;
 Sprite				sprite_logo;
 Sprite				sprite_player_g;
 Sprite				sprite_player_y;
 Sprite				sprite_player_r;
+Sprite				sprite_saucer;
+Sprite				sprite_saucer_alt;
+Sprite				sprite_saucer_death;
+Sprite				sprite_shield;
+Sprite				sprite_shield_alt;
+Sprite				sprite_shield_death;
 
 static const uint8_t		oled_width = 96;
 static const uint8_t		oled_height = 64;
@@ -101,11 +107,6 @@ init_sprites(void)
 	sprite_invader3_death.w = 14;
 	sprite_invader3_death.h = 10;
 
-	/* invader3 */
-	sprite_invader4.data = (uint16_t *)sprite_invader4_data;
-	sprite_invader4.w = 20;
-	sprite_invader4.h = 7;
-
 	/* logo */
 	sprite_logo.data = (uint16_t *)sprite_logo_data;
 	sprite_logo.w = 96;
@@ -123,6 +124,31 @@ init_sprites(void)
 	sprite_player_r.data = (uint16_t *)sprite_player_r_data;
 	sprite_player_r.w = 13;
 	sprite_player_r.h = 5;
+
+	/* saucer */
+	sprite_saucer.data = (uint16_t *)sprite_saucer_data;
+	sprite_saucer.w = 18;
+	sprite_saucer.h = 15;
+
+	sprite_saucer_alt.data = (uint16_t *)sprite_saucer_alt_data;
+	sprite_saucer_alt.w = 18;
+	sprite_saucer_alt.h = 15;
+
+	sprite_saucer_death.data = (uint16_t *)sprite_saucer_death_data;
+	sprite_saucer_death.w = 18;
+	sprite_saucer_death.h = 15;
+
+	sprite_shield.data = (uint16_t *)sprite_shield_data;
+	sprite_shield.w = 16;
+	sprite_shield.h = 3;
+
+	sprite_shield_alt.data = (uint16_t *)sprite_shield_alt_data;
+	sprite_shield_alt.w = 16;
+	sprite_shield_alt.h = 3;
+
+	sprite_shield_death.data = (uint16_t *)sprite_shield_death_data;
+	sprite_shield_death.w = 16;
+	sprite_shield_death.h = 3;
 }
 
 void
