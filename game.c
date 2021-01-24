@@ -37,16 +37,21 @@ void game_loop()
 	uint8_t ticks_till_move = (uint8_t)(1 + TICK_RATE);
 	Entity *k = player;
 	game_menu();
+	
 	#if SKIP_TO_BOSS //SKIPPING TO BOSS FOR TESTING
-		while (k->next != NULL)
+		//static uint8_t k_count = 0;
+		//kill_count = 19;
+		/*while (k->next != NULL)
 		{
 			k = k->next;
 			if (k->type == INVADER)
 			{
 				kill_entity(k);
-				if (kill_count == 0) break;
+				k->val = 1;
+				kill_entity(k);
+				if ((++k_count)==19) break;
 			}
-		}
+		}*/
 	#endif
 
 
@@ -133,6 +138,7 @@ void init_level(uint8_t x, uint8_t y)
 	ssd1331_clear_screen(BLACK);
 	int i, j;
 	lives = 3;
+	boss = 0;
 	invaders_dir = RIGHT;
 	init_entities();
 	player = create_entity(&sprite_player_g, &sprite_player_y, &sprite_player_r, x, y, PLAYER);
@@ -162,25 +168,27 @@ void game_over()
 {
 	char buf[8];
 
+
 	game_state = PAUSE;
 	delete_entity(player);
 	render_entities();
 	delay_ms(1000);
+	input_queue = 0;
 	ssd1331_clear_screen(BLACK);
 	if (score>high_score)
 	{
-		ssd1331_display_string(0, 8, "NEW HIGHSCORE", FONT_1608, RED);
+		ssd1331_display_string(0, 8, "NEW HI-SCORE", FONT_1608, RED);
 		high_score = score;
 	}
 	else ssd1331_display_string(16, 8, "SCORE:", FONT_1608, GREEN);
-	ssd1331_display_string(24, 32, u16toa(buf, 8, score), FONT_1608, WHITE);
+	ssd1331_display_string(24, 28, u16toa(buf, 8, score), FONT_1608, WHITE);
 	ssd1331_display_string(10, 52, "Press any key", FONT_1206, WHITE);
 
 	while (!input_queue) delay_ms(500/TICK_RATE);
 	input_queue = 0;
 
 	score = 0;
-	level_speed = 1;
+	level_speed = 10;
 	game_menu();
 
 }
@@ -226,11 +234,12 @@ void move_projectiles()
 	while ((i->next != NULL) && projectile_count)
 		{
 			i = i->next;
-			i->frame = ((i->frame)+1)%2;
+			
 			if (i->type == MISSILE_GOOD)
 			{
 				render_projectiles=1;
 				--(i->y);
+				i->frame = ((i->frame)+1)%2;
 				if((i->y)==7)
 				{
 					if (((i->x)+(i->sprite[0]->w)-2 > saucer->x) && ((i->x)+1)<(saucer->x)+(saucer->sprite[0]->w)-1)
@@ -265,19 +274,28 @@ void move_projectiles()
 				render_projectiles=1;
 				++(i->y);
 				i->frame = ((i->frame)+1)%2;
-				if ( ((i->y) == 60) && ((i->x)+(i->sprite[0]->w)-2 > (player->x)) && ((i->x)+1 < (player->x)+(player->sprite[0]->w)-1) ) //player hit
-					player_hit();
+				
+				if ((i->y) == 58)
+				{
+					if ( ((i->x)+(i->sprite[0]->w)-2 > (player->x)) && ((i->x)+1 < (player->x)+(player->sprite[0]->w)-1) ) //player hit
+						player_hit();
+					
+					--projectile_count; delete_entity(i);
+					
+				}
+				else if ((i->y) == 60) { --projectile_count; delete_entity(i); }
 			}
 		}
 	}
 }
 void move_player(enum direction dir)
 {
-	if ((player->x >= 1-dir) && (player->x <= 86+dir)) //out-of-bonds checking
+	if ((player->x >= 1-dir) && (player->x <= 84-dir)) //out-of-bonds checking
 	{
 		if (dir) ++(player->x);
 		else --(player->x);
-		draw_sprite(player->sprite[player->frame], player->x, player->y);
+		render_entity(player);
+		//draw_sprite(player->sprite[player->frame], player->x, player->y);
 	}
 
 }
@@ -294,8 +312,10 @@ void player_shoot()
 }
 void saucer_shoot()
 {
+	++projectile_count;
 	static enum direction alternate = RIGHT; //fire from alternating sides
 	create_entity(&sprite_laser1, &sprite_laser1_alt, &sprite_laser1_alt, (saucer->x)+2+alternate*12, (saucer->y)+6, MISSILE_BAD);
+	alternate=(alternate+1)%2;
 }
 void saucer_hit()
 {
@@ -307,7 +327,7 @@ void saucer_hit()
 void player_hit()
 {
 	if (!(--lives)) game_over();
-	else ++(player->frame);
+	else { ++(player->frame); render_entity(player); }
 
 
 }
@@ -334,7 +354,7 @@ void game_pause()
 	ssd1331_clear_screen(BLUE);
 
 	ssd1331_display_string(16, 8, "SCORE:", FONT_1608, WHITE);
-	ssd1331_display_string(24, 32, u16toa(buf, 8, score), FONT_1608, WHITE);
+	ssd1331_display_string(24, 28, u16toa(buf, 8, score), FONT_1608, WHITE);
 	ssd1331_display_string(10, 52, "Press any key", FONT_1206, WHITE);
 
 	while(!input_queue) delay_ms(500/TICK_RATE);
@@ -348,16 +368,16 @@ void game_pause()
 
 void boss_fight()
 {
-	delay_ms(60);
+	delay_ms(100);
 	ssd1331_clear_screen(RED);
-	delay_ms(130);
+	delay_ms(150);
 	ssd1331_clear_screen(BLACK);
 	render_entities();
-	delay_ms(190);
+	delay_ms(300);
 	ssd1331_clear_screen(RED);
-	delay_ms(130);
-	saucer = create_entity(&sprite_saucer, &sprite_saucer_alt, &sprite_saucer_death, 30, 3, SAUCER);
+	delay_ms(150);
 	ssd1331_clear_screen(BLACK);
+	saucer = create_entity(&sprite_saucer, &sprite_saucer_alt, &sprite_saucer_death, 30, 3, SAUCER);
 	render_entities();
 	boss=1;
 	//healthbar
@@ -369,11 +389,11 @@ void move_saucer()
 	static enum direction saucer_dir = RIGHT;
 	if (!(--saucer_timer))
 	{
-		saucer_timer = (uint8_t)(3+(TICK_RATE/3) - level_speed*TICK_RATE/260);
+		saucer_timer = (uint8_t)(2+(TICK_RATE/3) - level_speed*TICK_RATE/260);
 	if(saucer_dir) ++(saucer->x);
 		else --(saucer->x);
-	if (((saucer->x == 0) && !saucer_dir) || ((saucer->x == 82) && saucer_dir)) saucer_dir =(saucer_dir+1)%2;
-	pending_render = 1;
+	if (((saucer->x == 0) && !saucer_dir) || ((saucer->x == 79) && saucer_dir)) saucer_dir =(saucer_dir+1)%2;
+	render_entity(saucer);
 	}
 }
 
@@ -408,6 +428,6 @@ void kill_entity(Entity *e)
 			delete_entity(e);
 		}
 	}
-	else { (e->frame)=2; (e->val)=15; ++pending_kill;}
+	else { (e->frame)=2; (e->val)=12; ++pending_kill;}
 	pending_render = 1;
 }
