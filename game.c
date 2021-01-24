@@ -37,7 +37,19 @@ void game_loop()
 	uint8_t ticks_till_move = (uint8_t)(1 + TICK_RATE);
 	Entity *k = player;
 	game_menu();
-
+	#if SKIP_TO_BOSS //SKIPPING TO BOSS FOR TESTING
+		while (k->next != NULL)
+		{
+			k = k->next;
+			if (k->type == INVADER) 
+			{
+				kill_entity(k);
+				if (kill_count == 0) break;
+			}
+		}
+	#endif
+		
+	
 	while (1)
 	{
 		if (game_state == LEVEL)
@@ -214,6 +226,7 @@ void move_projectiles()
 			i->frame = ((i->frame)+1)%2;
 			if (i->type == MISSILE_GOOD)
 			{
+				render_projectiles=1;
 				--(i->y);
 				if((i->y)==7)
 				{
@@ -231,7 +244,6 @@ void move_projectiles()
 						{
 							--projectile_count;
 							kill_entity(j);
-							render_projectiles=1;
 						}
 						if ((j->type == INVADER) && ((i->x)+(i->sprite[0]->w)-2 > (j->x)) && ((i->x)+1 < (j->x)+(j->sprite[0]->w)-1) && (((i->y) == (j->y)+(j->sprite[0]->h)-1) || ((i->y) == (j->y)+(j->sprite[0]->h)-2)) )
 						{
@@ -239,7 +251,6 @@ void move_projectiles()
 							--projectile_count;
 							delete_entity(i);
 							if (!(j->val)) kill_entity(j);
-							render_projectiles=1;
 							break;
 						}
 						else if ((i->y) == 0) delete_entity(i); //projectile out of bonds
@@ -248,6 +259,7 @@ void move_projectiles()
 			}
 			else if(i->type == MISSILE_BAD)
 			{
+				render_projectiles=1;
 				++(i->y);
 				i->frame = ((i->frame)+1)%2;
 				if ( ((i->y) == 60) && ((i->x)+(i->sprite[0]->w)-2 > (player->x)) && ((i->x)+1 < (player->x)+(player->sprite[0]->w)-1) ) //player hit
