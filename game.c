@@ -17,7 +17,7 @@ static uint8_t kill_count=0;
 static uint8_t projectile_count=0;
 static uint8_t input_queue = 0;
 static uint8_t saucer_timer = 255;
-static uint8_t speedup_timer = TICKS_PER_SPEE	DUP;
+static uint8_t speedup_timer = TICKS_PER_SPEEDUP;
 static uint8_t pending_render=0;
 static uint8_t animation_cooldown=5;
 enum state game_state = MENU;
@@ -121,12 +121,13 @@ void move_invaders()
 		i = i->next;
 		if (i->type == INVADER)
 		{
-			if (((i->x == 0) && !invaders_dir) || ((i->x == 82) && invaders_dir)) dir_swap = 1; //checking if direction swap takes place
 			if (move_down)		
 			{
 				++(i->y);
 				if ((i->y)>43) game_over();
 			}
+			else if (((i->x == 1) && !invaders_dir) || ((i->x == 81) && invaders_dir)) dir_swap = 1; //checking if direction swap takes place
+			
 			if (!animation_cooldown) // animate 'em!
 				{
 					i->frame = ((i->frame)+1)%2;
@@ -134,10 +135,10 @@ void move_invaders()
 			if (invaders_dir) ++(i->x);
 			else --(i->x);
 		}
-		if (dir_swap){ invaders_dir = (invaders_dir+1)%2; move_down = 1; dir_swap = 0;}
-		else move_down = 0;
 	}
-	if (!animation_cooldown) animation_cooldown = 5;
+	if (dir_swap){ invaders_dir = (invaders_dir+1)%2; move_down = 1; dir_swap = 0;}
+		else move_down = 0;
+	if (!animation_cooldown) animation_cooldown = 10;
 	pending_render=1;
 }
 void move_projectiles()
@@ -165,7 +166,8 @@ void move_projectiles()
 						if (++kill_count == 20)
 						{
 							kill_count = 0;
-							init_level(player->x,player->y);
+							boss_fight();
+							//init_level(player->x,player->y);
 						}
 						break;
 					}
@@ -248,6 +250,13 @@ void game_pause()
 	render_entities();
 	delay_ms(250);
 }
+
+
+void boss_fight()
+{
+	
+}
+
 
 
 
