@@ -8,7 +8,7 @@
 static Entity *player;
 static Entity *saucer;
 static enum direction invaders_dir = RIGHT;
-static uint8_t level_speed = 6; //default 1, max 45, temp 6 for tests
+static uint8_t level_speed = 10; //default 1, max 90, temp 10 for tests
 static uint16_t score = 0;
 static uint16_t high_score = 0;
 static uint8_t lives = 3;
@@ -74,7 +74,7 @@ void game_loop()
 					move_invaders();
 					ticks_till_move = (uint8_t)(1 + TICK_RATE - level_speed*TICK_RATE/100);
 				}
-				if (level_speed < 80)
+				if (level_speed < 90)
 					{
 						if (speedup_timer) --speedup_timer;
 							else {  ++level_speed; speedup_timer = TICKS_PER_SPEEDUP; }
@@ -85,7 +85,7 @@ void game_loop()
 				move_saucer();
 				if (!(--boss_cooldown)) //saucer shooting
 				{
-					boss_cooldown = 100-(level_speed/2);
+					boss_cooldown = 100-(level_speed/3);
 					saucer_shoot();
 				}
 			}
@@ -319,11 +319,12 @@ void boss_fight()
 {
 	delay_ms(60);
 	ssd1331_clear_screen(RED);
-	delay_ms(90);
-	render_entities();
 	delay_ms(130);
+	render_entities();
+	delay_ms(190);
 	ssd1331_clear_screen(RED);
-	delay_ms(90);
+	delay_ms(130);
+	ssd1331_clear_screen(BLACK);
 	saucer = create_entity(&sprite_saucer, &sprite_saucer_alt, &sprite_saucer_death, 0, 1, SAUCER);
 	render_entities();
 	boss=1;
@@ -336,7 +337,7 @@ void move_saucer()
 	static enum direction saucer_dir = RIGHT;
 	if (!(--saucer_timer))
 	{
-		saucer_timer=2+(TICK_RATE/3) - level_speed*TICK_RATE/240;
+		saucer_timer=3+(TICK_RATE/3) - level_speed*TICK_RATE/260;
 	if(saucer_dir) ++(saucer->x);
 		else --(saucer->x);
 	if (((saucer->x == 0) && !saucer_dir) || ((saucer->x == 82) && saucer_dir)) saucer_dir =(saucer_dir+1)%2;
