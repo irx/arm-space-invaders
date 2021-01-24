@@ -1,4 +1,4 @@
-/*
+/**
  * 2021, Maksymilian Mruszczak <u at one u x dot o r g>
  *
  * A utility for drawing a sprite on SSD1331-based OLED display
@@ -151,6 +151,33 @@ init_sprites(void)
 	sprite_shield_death.h = 3;
 }
 
+/**
+ * like itoa (int to str) but specifically for uint16
+ * returns null-terminated string located at addr
+ * pointed by first arg
+ */
+char *
+u16toa(char *dst, unsigned int len, uint16_t src)
+{
+	int i;
+	uint16_t dig, div = 1;
+	while (div < src)
+		div *= 10;
+	i = 0;
+	while (i++ < len && src > 0) {
+		div /= 10;
+		dig = src / div;
+		dst[i] = (char)(dig + 48);
+		src -= dig * div;
+	}
+	dst[i] = '\0';
+	return dst;
+}
+
+/**
+ * draw or clear sprite
+ * writes bytes directly to SSD1331 over SPI
+ */
 void
 draw_clear_sprite(uint8_t draw, const Sprite *s, uint8_t x, uint8_t y)
 {

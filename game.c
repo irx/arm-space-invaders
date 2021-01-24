@@ -160,6 +160,8 @@ void init_level(uint8_t x, uint8_t y)
 
 void game_over()
 {
+	char buf[8];
+
 	game_state = PAUSE;
 	delete_entity(player);
 	delay_ms(1000);
@@ -170,7 +172,7 @@ void game_over()
 		high_score = score;
 	}
 	else ssd1331_display_string(16, 8, "SCORE:", FONT_1608, GREEN);
-	//ssd1331_display_num(24, 32, score, 4, FONT_1608, WHITE);
+	ssd1331_display_string(24, 32, u16toa(buf, 8, score), FONT_1608, WHITE);
 	ssd1331_display_string(10, 52, "Press any key", FONT_1206, WHITE);
 	
 	while (!input_queue) delay_ms(500/TICK_RATE);
@@ -324,12 +326,14 @@ void queue_input(enum input_type input)
 
 void game_pause()
 {
+	char buf[8];
+
 	input_queue = 0;
 	game_state = PAUSE;
 	ssd1331_clear_screen(BLUE);
 	
 	ssd1331_display_string(16, 8, "SCORE:", FONT_1608, WHITE);
-	//ssd1331_display_num(24, 32, score, 4, FONT_1608, WHITE);
+	ssd1331_display_string(24, 32, u16toa(buf, 8, score), FONT_1608, WHITE);
 	ssd1331_display_string(10, 52, "Press any key", FONT_1206, WHITE);
 	
 	while(!input_queue) delay_ms(500/TICK_RATE);
