@@ -27,7 +27,7 @@ static uint8_t boss_lives = 6;
 static uint8_t boss_cooldown = 100;
 static uint8_t boss_iframes = 0;
 //static uint8_t shield;
-
+	 
 
 enum state game_state = MENU;
 
@@ -47,7 +47,7 @@ void game_loop()
 				while (k->next != NULL)
 				{
 					k = k->next;
-					if (k->frame == 3) 
+					if (k->frame == 2) 
 						{
 							kill_entity(k);
 							if (!(--pending_kill)) break;
@@ -171,7 +171,7 @@ void move_invaders()
 			}
 			else if (((i->x == 1) && !invaders_dir) || ((i->x == 81) && invaders_dir)) dir_swap = 1; //checking if direction swap takes place
 			
-			if (!animation_cooldown) // animate 'em!
+			if (!animation_cooldown && i->frame != 3) // animate 'em!
 				{
 					i->frame = ((i->frame)+1)%2;
 				}
@@ -272,8 +272,8 @@ void saucer_hit()
 void player_hit()
 {
 	if (!(--lives)) game_over();
-	if ( player->frame != 3) ++(player->frame);
-	//else do some player hit stuff like changing sprites
+	else ++(player->frame);
+
 
 }
 
@@ -351,7 +351,7 @@ void game_menu()
 
 void kill_entity(Entity *e)
 {
-	if (e->frame == 3)
+	if (e->frame == 2)
 	{
 		if (e->type == INVADER)
 		{
@@ -368,7 +368,7 @@ void kill_entity(Entity *e)
 			delete_entity(e);
 		}
 	}
-	else { (e->frame)=3; ++pending_kill;}
+	else { (e->frame)=2; ++pending_kill;}
 }
 
 
