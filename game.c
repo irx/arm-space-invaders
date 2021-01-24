@@ -19,13 +19,14 @@ static uint8_t input_queue = 0;
 static uint8_t saucer_timer = 255;
 static uint8_t speedup_timer = TICKS_PER_SPEEDUP;
 static uint8_t pending_render=0;
+static uint8_t animation_cooldown=5;
 enum state game_state = MENU;
 
 void game_loop()
 {
 
 	score = 0;
-	uint8_t ticks_till_move = (uint8_t)(2 + TICK_RATE);
+	uint8_t ticks_till_move = (uint8_t)(1 + TICK_RATE);
 
 	init_level(42,54);
 	
@@ -33,29 +34,27 @@ void game_loop()
 	
 	while (1)
 	{
-		if(game_state == PAUSE)
-		{
-			while(!input_queue) delay_ms(500/TICK_RATE);
-			game_unpause();
-		}
-		
 		if (game_state == LEVEL)
 		{
 			if (input_queue)
 			{
-				
 				if (input_queue & INPUT_SHOOT) player_shoot();
 				if (input_queue & INPUT_LEFT) move_player(LEFT);
 					else if (input_queue & INPUT_RIGHT) move_player(RIGHT);
+				if (input_queue & INPUT_PAUSE) game_pause();
 				input_queue = 0;
 			}
+			if (animation_cooldown) --animation_cooldown;
 			if (!(--ticks_till_move))
 			{
 				move_invaders();
-				ticks_till_move = (uint8_t)(2 + TICK_RATE - level_speed*TICK_RATE/40);
+				ticks_till_move = (uint8_t)(1 + TICK_RATE - level_speed*TICK_RATE/100);
 			}
-			if (speedup_timer && level_speed < 40) --speedup_timer;
-				else { ++level_speed; speedup_timer = TICKS_PER_SPEEDUP; }
+			if (level_speed < 80)
+				{
+					if (speedup_timer) --speedup_timer;
+						else {  ++level_speed; speedup_timer = TICKS_PER_SPEEDUP; }
+				}
 			if (cooldown) --cooldown;
 			move_projectiles();
 		}
@@ -128,7 +127,11 @@ void move_invaders()
 				++(i->y);
 				if ((i->y)>43) game_over();
 			}
-			i->frame = ((i->frame)+1)%2; // animate 'em!
+			if (!animation_cooldown) // animate 'em!
+				{
+					i->frame = ((i->frame)+1)%2;
+					animation_cooldown = 5;
+				}
 			if (invaders_dir) ++(i->x);
 			else --(i->x);
 		}
@@ -223,8 +226,7 @@ void delay_ms( int n)
 
 void queue_input(enum input_type input)
 {
-	if ((input == INPUT_PAUSE) && (game_state == LEVEL)) game_pause();
-	else input_queue = input_queue | input;
+	input_queue = input_queue | input;
 }
 
 
@@ -235,15 +237,15 @@ void game_pause()
 	ssd1331_clear_screen(BLUE);
 	ssd1331_display_string(0, 20, "SCORE:", FONT_1206, WHITE);
 	ssd1331_num(30, 40, score, 0, FONT_1206, WHITE);
-}
+	
+	while(!input_queue) delay_ms(500/TICK_RATE);
 
-void game_unpause()
-{
 	input_queue = 0;
 	ssd1331_clear_screen(BLACK);
 	game_state = LEVEL;
 	render_entities();
 	delay_ms(250);
 }
+
 
 

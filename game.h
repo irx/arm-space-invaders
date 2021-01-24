@@ -1,7 +1,7 @@
 #define TICK_RATE 50
 #define SPRITES_TOTAL 11
 #define SHOOT_COOLDOWN 15
-#define TICKS_PER_SPEEDUP 70
+#define TICKS_PER_SPEEDUP 25
 
 enum entity_type{ PLAYER, INVADER, SAUCER, MISSILE_GOOD, MISSILE_BAD };
 enum state{ MENU, PAUSE, LEVEL };
@@ -22,4 +22,4 @@ void player_shoot(void);
 void invader_shoot(Entity *e);
 void queue_input(enum input_type input);
 void game_pause(void);
-void game_unpause(void);
+
