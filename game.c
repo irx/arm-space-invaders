@@ -201,7 +201,7 @@ void move_projectiles()
 			if (i->type == MISSILE_GOOD)
 			{
 				--(i->y);
-				if((i->y)==4)
+				if((i->y)==7)
 				{
 					if (((i->x)+(i->sprite[0]->w)-2 > saucer->x) && ((i->x)+1)<(saucer->x)+(saucer->sprite[0]->w)-1)
 					{
@@ -213,7 +213,7 @@ void move_projectiles()
 					while (j->next != NULL) //scanning entities for hit
 					{
 						j = j->next;
-						if((i->y)==8 && (j->type == SHIELD) && ((i->x)+(i->sprite[0]->w)-2 > (j->x)) && ((i->x)+1 < (j->x)+(j->sprite[0]->w)-1))
+						if((i->y)==11 && (j->type == SHIELD) && ((i->x)+(i->sprite[0]->w)-2 > (j->x)) && ((i->x)+1 < (j->x)+(j->sprite[0]->w)-1))
 						{
 							--projectile_count;
 							kill_entity(j);
@@ -320,12 +320,13 @@ void boss_fight()
 	delay_ms(60);
 	ssd1331_clear_screen(RED);
 	delay_ms(130);
+	ssd1331_clear_screen(BLACK);
 	render_entities();
 	delay_ms(190);
 	ssd1331_clear_screen(RED);
 	delay_ms(130);
+	saucer = create_entity(&sprite_saucer, &sprite_saucer_alt, &sprite_saucer_death, 30, 3, SAUCER);
 	ssd1331_clear_screen(BLACK);
-	saucer = create_entity(&sprite_saucer, &sprite_saucer_alt, &sprite_saucer_death, 0, 1, SAUCER);
 	render_entities();
 	boss=1;
 	//healthbar
@@ -337,10 +338,11 @@ void move_saucer()
 	static enum direction saucer_dir = RIGHT;
 	if (!(--saucer_timer))
 	{
-		saucer_timer=3+(TICK_RATE/3) - level_speed*TICK_RATE/260;
+		saucer_timer = (uint8_t)(3+(TICK_RATE/3) - level_speed*TICK_RATE/260);
 	if(saucer_dir) ++(saucer->x);
 		else --(saucer->x);
 	if (((saucer->x == 0) && !saucer_dir) || ((saucer->x == 82) && saucer_dir)) saucer_dir =(saucer_dir+1)%2;
+	pending_render = 1;
 	}
 }
 
