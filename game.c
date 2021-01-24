@@ -113,10 +113,19 @@ void game_over()
 {
 	game_state = PAUSE;
 	delete_entity(player);
-	delay_ms(2000);
-	//gonna display score and wait for any input to restart the game
-	//show score, compare score and current highscore
-	//wait for button press
+	delay_ms(1000);
+	
+	if (score>high_score)
+	{
+		ssd1331_display_string(8, 8, "NEW HIGHSCORE:", FONT_1608, RED);
+		high_score = score;
+	}
+	else ssd1331_display_string(16, 8, "SCORE:", FONT_1608, GREEN);
+	//ssd1331_display_num(24, 32, score, 4, FONT_1608, WHITE);
+	ssd1331_display_string(10, 52, "Press any key", FONT_1206, WHITE);
+	
+	while (!input_queue);
+	input_queue = 0;
 	
 	score = 0;
 	level_speed = 1;
@@ -255,11 +264,12 @@ void game_pause()
 	input_queue = 0;
 	game_state = PAUSE;
 	ssd1331_clear_screen(BLUE);
-	ssd1331_display_string(0, 20, "SCORE:", FONT_1206, WHITE);
-	//ssd1331_display_num(30, 40, score, 4, FONT_1206, WHITE);
 	
-	while(!input_queue) delay_ms(500/TICK_RATE);
-
+	ssd1331_display_string(16, 8, "SCORE:", FONT_1608, WHITE);
+	//ssd1331_display_num(24, 32, score, 4, FONT_1608, WHITE);
+	ssd1331_display_string(10, 52, "Press any key", FONT_1206, WHITE);
+	
+	while(!input_queue);
 	input_queue = 0;
 	ssd1331_clear_screen(BLACK);
 	game_state = LEVEL;
