@@ -49,8 +49,11 @@ void game_loop()
 					k = k->next;
 					if (k->val > 1) 
 					{
-						if (--(k->val) == 1) kill_entity(k);
-						if (!(--pending_kill)) break;
+						if (--(k->val) == 1) 
+						{
+							kill_entity(k);
+							if (!(--pending_kill)) break;
+						}
 					}
 				}
 			}
