@@ -28,4 +28,4 @@ void boss_fight(void);
 void move_saucer(void);
 void saucer_hit(void);
 void kill_entity(Entity *e);
-
+void saucer_shield(uint8_t, uint8_t);

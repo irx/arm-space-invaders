@@ -28,6 +28,7 @@ static uint8_t boss=0;
 static uint8_t boss_lives = 6;
 static uint8_t boss_cooldown = 150;
 static uint8_t boss_iframes = 0;
+static uint8_t bullet_hell = 0;
 //static uint8_t shield;
 
 
@@ -91,9 +92,18 @@ void game_loop()
 					if ((saucer->frame == 1) && boss_iframes) --boss_iframes;
 						else saucer->frame = 0;
 							
+					if((boss_lives)<=3)
+					{
+						if (!(--ticks_till_move))
+						{
+							move_invaders();
+							ticks_till_move = (uint8_t)(1 + (TICK_RATE/2) - level_speed*TICK_RATE/226);
+						}
+					}
+					
 					if (!(--boss_cooldown)) //saucer shooting
 					{
-						boss_cooldown = 165-(level_speed/2);
+						boss_cooldown = 165-(level_speed/3)-70*bullet_hell;
 						saucer_shoot();
 					}
 				}
@@ -230,7 +240,7 @@ void move_projectiles()
 	while ((i->next != NULL) && projectile_count)
 		{
 			i = i->next;
-			
+			if ((i->type == SHIELD) && (i->frame != 2)) { i->frame = ((i->frame)+1)%2; render_entity(i); }
 			if (i->type == MISSILE_GOOD)
 			{
 				render_projectiles=1;
@@ -250,7 +260,7 @@ void move_projectiles()
 					while (j->next != NULL) //scanning entities for hit
 					{
 						j = j->next;
-						if((i->y)==11 && (j->type == SHIELD) && ((i->x)+(i->sprite[0]->w)-2 > (j->x)) && ((i->x)+1 < (j->x)+(j->sprite[0]->w)-1))
+						if((i->y)<(j->y)+3 && (j->type == SHIELD) && ((i->x)+(i->sprite[0]->w)-2 > (j->x)) && ((i->x)+1 < (j->x)+(j->sprite[0]->w)-1))
 						{
 							--projectile_count;
 							delete_entity(i);
@@ -267,8 +277,8 @@ void move_projectiles()
 						else if ((i->y) == 0) //projectile out of bonds
 						{
 							delete_entity(i);
-							//if (healthbar[0] != NULL) render_entity(healthbar[0]);
-							//if (healthbar[1] != NULL) render_entity(healthbar[1]);
+							if (healthbar[0] != NULL) render_entity(healthbar[0]);
+							if (healthbar[1] != NULL) render_entity(healthbar[1]);
 						}
 					}
 				}
@@ -321,6 +331,12 @@ void saucer_shoot()
 	create_entity(&sprite_laser1, &sprite_laser1_alt, &sprite_laser1_alt, (saucer->x)+2+alternate*12, (saucer->y)+6, MISSILE_BAD);
 	alternate=(alternate+1)%2;
 }
+
+void saucer_shield(uint8_t x, uint8_t y)
+{
+	render_entity(create_entity(&sprite_shield, &sprite_shield_alt, &sprite_shield_death, x, y, SHIELD));
+}
+
 void saucer_hit()
 {
 	if (!(--boss_lives))
@@ -331,27 +347,43 @@ void saucer_hit()
 	}
 	else
 	{
-		boss_iframes = 3*TICK_RATE;
+		boss_iframes = 4*TICK_RATE;
 		saucer->frame = 1;
 		switch (boss_lives)
 		{
 			case 5:
 				healthbar[1]->frame = 1;
 				render_entity(healthbar[1]);
+				saucer_shield(saucer->x,(saucer->y)+8);
 				break;
 			case 4:
 				healthbar[1]->frame = 2;
 				render_entity(healthbar[1]);
+				saucer_shield(15,(saucer->y)+14);
+				saucer_shield(48-(sprite_shield.w)/2,(saucer->y)+15);
+				saucer_shield(80-(sprite_shield.w),(saucer->y)+15);
 				break;
 			case 3:
 				delete_entity(healthbar[1]);
 				healthbar[1] = NULL;
+				delay_ms(50);
+				ssd1331_clear_screen(GREEN);
+				delay_ms(220);
+				ssd1331_clear_screen(BLACK);
+				create_entity(&sprite_invader, &sprite_invader_alt, &sprite_invader_death, 5+15*0, 27, INVADER);
+				create_entity(&sprite_invader, &sprite_invader_alt, &sprite_invader_death, 5+15*1, 27, INVADER);
+				create_entity(&sprite_invader, &sprite_invader_alt, &sprite_invader_death, 5+15*2, 27, INVADER);
+				create_entity(&sprite_invader, &sprite_invader_alt, &sprite_invader_death, 5+15*3, 27, INVADER);
+				render_entities();
 			break;
 			case 2:
 				healthbar[0]->frame = 1;
 				render_entity(healthbar[0]);
+				saucer_shield(22,(saucer->y)+8);
+				saucer_shield(73-(sprite_shield.w),(saucer->y)+8);
 				break;
 			case 1:
+				bullet_hell = 1;	
 				healthbar[0]->frame = 2;
 				render_entity(healthbar[0]);
 				break;
@@ -419,6 +451,7 @@ void boss_fight()
 	healthbar[0] = create_entity(&sprite_bar1, &sprite_bar2, &sprite_bar3, 0, 0, HEALTHBAR);
 	healthbar[1] = create_entity(&sprite_bar1, &sprite_bar2, &sprite_bar3, 48, 0, HEALTHBAR);
 	boss=1;
+	bullet_hell = 0;
 	boss_iframes = 3*TICK_RATE;
 	saucer->frame = 1;
 	render_entities();
@@ -430,7 +463,8 @@ void move_saucer()
 	static enum direction saucer_dir = RIGHT;
 	if (!(--saucer_timer))
 	{
-		saucer_timer = (uint8_t)(2+(TICK_RATE/3) - level_speed*TICK_RATE/260);
+		if (!bullet_hell) saucer_timer = (uint8_t)(2+(TICK_RATE/3) - level_speed*TICK_RATE/260);
+			else saucer_timer = (uint8_t)(2+(TICK_RATE/6) - level_speed*TICK_RATE/520);
 	if(saucer_dir) ++(saucer->x);
 		else --(saucer->x);
 	if (((saucer->x == 0) && !saucer_dir) || ((saucer->x == 79) && saucer_dir)) saucer_dir =(saucer_dir+1)%2;
