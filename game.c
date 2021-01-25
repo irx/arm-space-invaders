@@ -7,6 +7,7 @@
 
 static Entity *player;
 static Entity *saucer;
+static Entity *healthbar[2] = {NULL, NULL};
 static enum direction invaders_dir = RIGHT;
 static uint8_t level_speed = 10; //default 1, max 90, temp 10 for tests
 static uint16_t score = 0;
@@ -37,22 +38,6 @@ void game_loop()
 	uint8_t ticks_till_move = (uint8_t)(1 + TICK_RATE);
 	Entity *k = player;
 	game_menu();
-	
-	#if SKIP_TO_BOSS //SKIPPING TO BOSS FOR TESTING
-		//static uint8_t k_count = 0;
-		//kill_count = 19;
-		/*while (k->next != NULL)
-		{
-			k = k->next;
-			if (k->type == INVADER)
-			{
-				kill_entity(k);
-				k->val = 1;
-				kill_entity(k);
-				if ((++k_count)==19) break;
-			}
-		}*/
-	#endif
 
 
 	while (1)
@@ -101,6 +86,9 @@ void game_loop()
 			else //boss fight stuff
 			{
 				move_saucer();
+				if ((saucer->frame == 1) && boss_iframes) --boss_iframes;
+					else saucer->frame = 0;
+						
 				if (!(--boss_cooldown)) //saucer shooting
 				{
 					boss_cooldown = 165-(level_speed/2);
@@ -139,7 +127,10 @@ void init_level(uint8_t x, uint8_t y)
 	int i, j;
 	lives = 3;
 	boss = 0;
+	kill_count=0;
+	pending_kill = 0;
 	invaders_dir = RIGHT;
+	healthbar[0] = NULL; healthbar[1] = NULL;
 	init_entities();
 	player = create_entity(&sprite_player_g, &sprite_player_y, &sprite_player_r, x, y, PLAYER);
 	for (i = 0; i < 4; i++)
@@ -189,6 +180,8 @@ void game_over()
 
 	score = 0;
 	level_speed = 10;
+	
+	
 	game_menu();
 
 }
@@ -240,11 +233,13 @@ void move_projectiles()
 				render_projectiles=1;
 				--(i->y);
 				i->frame = ((i->frame)+1)%2;
-				if((i->y)==7)
+				if((i->y)==10)
 				{
 					if (((i->x)+(i->sprite[0]->w)-2 > saucer->x) && ((i->x)+1)<(saucer->x)+(saucer->sprite[0]->w)-1)
 					{
-						saucer_hit();
+						--projectile_count;
+						kill_entity(j);
+						if (!boss_iframes && !(saucer->val)) saucer_hit();
 					}
 				}
 				else
@@ -265,7 +260,12 @@ void move_projectiles()
 							if (!(j->val)) kill_entity(j);
 							break;
 						}
-						else if ((i->y) == 0) delete_entity(i); //projectile out of bonds
+						else if ((i->y) == 0) //projectile out of bonds
+						{
+							delete_entity(i);
+							if (healthbar[0] != NULL) render_entity(healthbar[0]);
+							if (healthbar[1] != NULL) render_entity(healthbar[1]);
+						}
 					}
 				}
 			}
@@ -319,6 +319,38 @@ void saucer_shoot()
 }
 void saucer_hit()
 {
+	if (!(--boss_lives))
+	{
+		kill_entity(saucer);
+		delete_entity(healthbar[0]);
+	}
+	else
+	{
+		boss_iframes = 2*TICK_RATE;
+		saucer->frame = 1;
+		switch (boss_lives)
+		{
+			case 5:
+				healthbar[1]->frame = 1;
+				render_entity(healthbar[1]);
+				break;
+			case 4:
+				healthbar[1]->frame = 2;
+				render_entity(healthbar[1]);
+				break;
+			case 3:
+				delete_entity(healthbar[1]);
+				break;
+			case 2:
+				healthbar[0]->frame = 1;
+				render_entity(healthbar[1]);
+				break;
+			case 1:
+				healthbar[0]->frame = 2;
+				render_entity(healthbar[1]);
+				break;		
+		}
+	}
 
 }
 
@@ -336,7 +368,7 @@ void delay_ms( int n)
 {
 	volatile int i, j;
 	for( i = 0 ; i < n; i++)
-	for(j = 0; j < 3500; j++) {}
+	for(j = 0; j < 3440; j++) {}
 }
 
 void queue_input(enum input_type input)
@@ -377,10 +409,12 @@ void boss_fight()
 	ssd1331_clear_screen(RED);
 	delay_ms(150);
 	ssd1331_clear_screen(BLACK);
-	saucer = create_entity(&sprite_saucer, &sprite_saucer_alt, &sprite_saucer_death, 30, 3, SAUCER);
-	render_entities();
+	saucer = create_entity(&sprite_saucer, &sprite_saucer_alt, &sprite_saucer_death, 30, 5, SAUCER);
+	healthbar[0] = create_entity(&sprite_bar1, &sprite_bar2, &sprite_bar3, 0, 0, HEALTHBAR);
+	healthbar[1] = create_entity(&sprite_bar1, &sprite_bar2, &sprite_bar3, 48, 0, HEALTHBAR);
 	boss=1;
 	//healthbar
+	render_entities();
 }
 
 void move_saucer()
