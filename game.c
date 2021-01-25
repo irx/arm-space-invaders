@@ -253,7 +253,7 @@ move_invaders(void)
 			if (move_down)
 			{
 				++(i->y);
-				if ((i->y)>43) game_over();
+				if ((i->y)>43) {game_over(); return;}
 			}
 			else if (((i->x == 1) && !invaders_dir) || ((i->x == 81) && invaders_dir)) dir_swap = 1; //checking if direction swap takes place
 
@@ -519,8 +519,8 @@ move_saucer(void)
 	static enum direction saucer_dir = RIGHT;
 	if (!(--saucer_timer))
 	{
-		if (!bullet_hell) saucer_timer = (uint8_t)(2+(TICK_RATE/3) - level_speed*TICK_RATE/520);
-			else saucer_timer = (uint8_t)(2+(TICK_RATE/4) - level_speed*TICK_RATE/520);
+		if (!bullet_hell) saucer_timer = (uint8_t)(2+(TICK_RATE/4) - level_speed*TICK_RATE/520);
+			else saucer_timer = (uint8_t)(2+(TICK_RATE/5) - level_speed*TICK_RATE/520);
 	if(saucer_dir) ++(saucer->x);
 		else --(saucer->x);
 	if (((saucer->x == 0) && !saucer_dir) || ((saucer->x == 79) && saucer_dir)) saucer_dir =(saucer_dir+1)%2;
