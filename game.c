@@ -18,9 +18,13 @@ static uint8_t kill_count=0;
 static uint8_t projectile_count=0;
 static uint8_t input_queue = 0;
 static uint8_t pending_kill = 0;
+static uint8_t ticks_per_speedup = 5; //starting 5, increment 1, max 50
 
-static uint8_t speedup_timer = TICKS_PER_SPEEDUP;
+static uint8_t reset_x = 42;
+static uint8_t reset_y = 54;
+static uint8_t speedup_timer = 5;
 static uint8_t pending_render=0;
+static uint8_t pending_reset=0;
 static uint8_t render_projectiles=0;
 static uint8_t animation_cooldown=5;
 
@@ -81,7 +85,7 @@ void game_loop()
 				if (level_speed < 90)
 					{
 						if (speedup_timer) --speedup_timer;
-							else {  ++level_speed; speedup_timer = TICKS_PER_SPEEDUP; }
+							else {  ++level_speed; speedup_timer = ticks_per_speedup; if(ticks_per_speedup<50) ++ticks_per_speedup; }
 					}
 			}
 			else //boss fight stuff
@@ -103,7 +107,7 @@ void game_loop()
 					
 					if (!(--boss_cooldown)) //saucer shooting
 					{
-						boss_cooldown = 165-(level_speed/3)-70*bullet_hell;
+						boss_cooldown = 165-(level_speed/2)-80*bullet_hell;
 						saucer_shoot();
 					}
 				}
@@ -112,6 +116,7 @@ void game_loop()
 			if (animation_cooldown) --animation_cooldown;
 			if (cooldown) --cooldown;
 			move_projectiles();
+			
 		}
 
 		if (pending_render) { render_entities(); pending_render=0; render_projectiles = 0;}
@@ -128,6 +133,7 @@ void game_loop()
 			}
 			render_projectiles = 0;
 		}
+		if(pending_reset) { pending_reset=0; init_level(reset_x, reset_y); }
 		delay_ms((int)(1000/TICK_RATE));
 	}
 
@@ -354,12 +360,12 @@ void saucer_hit()
 			case 5:
 				healthbar[1]->frame = 1;
 				render_entity(healthbar[1]);
-				saucer_shield(saucer->x,(saucer->y)+8);
+				saucer_shield(saucer->x,(saucer->y)+9);
 				break;
 			case 4:
 				healthbar[1]->frame = 2;
 				render_entity(healthbar[1]);
-				saucer_shield(15,(saucer->y)+14);
+				saucer_shield(15,(saucer->y)+15);
 				saucer_shield(48-(sprite_shield.w)/2,(saucer->y)+15);
 				saucer_shield(80-(sprite_shield.w),(saucer->y)+15);
 				break;
@@ -370,17 +376,18 @@ void saucer_hit()
 				ssd1331_clear_screen(GREEN);
 				delay_ms(220);
 				ssd1331_clear_screen(BLACK);
-				create_entity(&sprite_invader, &sprite_invader_alt, &sprite_invader_death, 5+15*0, 27, INVADER);
-				create_entity(&sprite_invader, &sprite_invader_alt, &sprite_invader_death, 5+15*1, 27, INVADER);
-				create_entity(&sprite_invader, &sprite_invader_alt, &sprite_invader_death, 5+15*2, 27, INVADER);
-				create_entity(&sprite_invader, &sprite_invader_alt, &sprite_invader_death, 5+15*3, 27, INVADER);
+				create_entity(&sprite_invader, &sprite_invader_alt, &sprite_invader_death, 4+15*0, 27, INVADER);
+				create_entity(&sprite_invader, &sprite_invader_alt, &sprite_invader_death, 4+15*1, 27, INVADER);
+				create_entity(&sprite_invader, &sprite_invader_alt, &sprite_invader_death, 4+15*2, 27, INVADER);
+				create_entity(&sprite_invader, &sprite_invader_alt, &sprite_invader_death, 4+15*3, 27, INVADER);
+				create_entity(&sprite_invader, &sprite_invader_alt, &sprite_invader_death, 4+15*4, 27, INVADER);			
 				render_entities();
 			break;
 			case 2:
 				healthbar[0]->frame = 1;
 				render_entity(healthbar[0]);
-				saucer_shield(22,(saucer->y)+8);
-				saucer_shield(73-(sprite_shield.w),(saucer->y)+8);
+				saucer_shield(22,(saucer->y)+9);
+				saucer_shield(73-(sprite_shield.w),(saucer->y)+9);
 				break;
 			case 1:
 				bullet_hell = 1;	
@@ -452,6 +459,7 @@ void boss_fight()
 	healthbar[1] = create_entity(&sprite_bar1, &sprite_bar2, &sprite_bar3, 48, 0, HEALTHBAR);
 	boss=1;
 	bullet_hell = 0;
+	boss_lives = 6;
 	boss_iframes = 3*TICK_RATE;
 	saucer->frame = 1;
 	render_entities();
@@ -481,7 +489,7 @@ void game_menu()
 	ssd1331_display_string(10, 52, "Press any key", FONT_1206, WHITE);
 	while (!input_queue) delay_ms(500/TICK_RATE);
 	input_queue = 0;
-	init_level(42,54);
+	pending_reset = 1;
 }
 
 void kill_entity(Entity *e)
@@ -492,10 +500,13 @@ void kill_entity(Entity *e)
 		{
 			score+=10;
 			delete_entity(e);
-			if (++kill_count == 20)
+			if (!boss)
 			{
-				kill_count = 0;
-				boss_fight();
+				if (++kill_count == 20)
+				{
+					kill_count = 0;
+					boss_fight();
+				}
 			}
 		}
 		else if (e->type == SAUCER)
@@ -503,6 +514,18 @@ void kill_entity(Entity *e)
 			delete_entity(e);
 			saucer = NULL;
 			boss = 0;
+			delay_ms(60);
+			ssd1331_clear_screen(GREY);
+			delay_ms(150);
+			ssd1331_clear_screen(BLACK);
+			render_entity(player);
+			delay_ms(600);
+			ssd1331_clear_screen(GREEN);
+			delay_ms(300);
+			reset_x = player->x; reset_y = player->y;
+			pending_reset = 1;
+			
+			
 		}
 		else if (e->type == SHIELD)
 		{
@@ -512,7 +535,7 @@ void kill_entity(Entity *e)
 	else { 
 		e->frame = 2;
 		++pending_kill;
-		if ((e->type) == SAUCER) e->val=33;
+		if ((e->type) == SAUCER) { score+=200; e->val=36;}
 			else e->val=13; 
 	}
 	pending_render = 1;
