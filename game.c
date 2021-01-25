@@ -18,11 +18,11 @@ static uint8_t kill_count=0;
 static uint8_t projectile_count=0;
 static uint8_t input_queue = 0;
 static uint8_t pending_kill = 0;
-static uint8_t ticks_per_speedup = 5; //starting 5, increment 1, max 50
+static uint8_t ticks_per_speedup = 5; //starting 10, increment 1, max 40
 
 static uint8_t reset_x = 42;
 static uint8_t reset_y = 54;
-static uint8_t speedup_timer = 5;
+static uint8_t speedup_timer = 10;
 static uint8_t pending_render=0;
 static uint8_t pending_reset=0;
 static uint8_t render_projectiles=0;
@@ -85,7 +85,7 @@ void game_loop()
 				if (level_speed < 90)
 					{
 						if (speedup_timer) --speedup_timer;
-							else {  ++level_speed; speedup_timer = ticks_per_speedup; if(ticks_per_speedup<50) ++ticks_per_speedup; }
+							else {  ++level_speed; speedup_timer = ticks_per_speedup; if(ticks_per_speedup<40) ++ticks_per_speedup; }
 					}
 			}
 			else //boss fight stuff
@@ -95,7 +95,7 @@ void game_loop()
 					move_saucer();
 					if ((saucer->frame == 1) && boss_iframes) --boss_iframes;
 						else saucer->frame = 0;
-							
+
 					if((boss_lives)<=3)
 					{
 						if (!(--ticks_till_move))
@@ -104,10 +104,10 @@ void game_loop()
 							ticks_till_move = (uint8_t)(1 + (TICK_RATE/2) - level_speed*TICK_RATE/226);
 						}
 					}
-					
+
 					if (!(--boss_cooldown)) //saucer shooting
 					{
-						boss_cooldown = 165-(level_speed/2)-80*bullet_hell;
+						boss_cooldown = 200-level_speed-80*bullet_hell;
 						saucer_shoot();
 					}
 				}
@@ -116,7 +116,7 @@ void game_loop()
 			if (animation_cooldown) --animation_cooldown;
 			if (cooldown) --cooldown;
 			move_projectiles();
-			
+
 		}
 
 		if (pending_render) { render_entities(); pending_render=0; render_projectiles = 0;}
@@ -199,8 +199,8 @@ void game_over()
 
 	score = 0;
 	level_speed = 10;
-	
-	
+
+
 	game_menu();
 
 }
@@ -294,14 +294,14 @@ void move_projectiles()
 				render_projectiles=1;
 				++(i->y);
 				i->frame = ((i->frame)+1)%2;
-				
+
 				if ((i->y) == 58)
 				{
 					if ( ((i->x)+(i->sprite[0]->w)-2 > (player->x)) && ((i->x)+1 < (player->x)+(player->sprite[0]->w)-1) ) //player hit
 						player_hit();
-					
+
 					--projectile_count; delete_entity(i);
-					
+
 				}
 				else if ((i->y) == 60) { --projectile_count; delete_entity(i); }
 			}
@@ -380,7 +380,7 @@ void saucer_hit()
 				create_entity(&sprite_invader, &sprite_invader_alt, &sprite_invader_death, 4+15*1, 27, INVADER);
 				create_entity(&sprite_invader, &sprite_invader_alt, &sprite_invader_death, 4+15*2, 27, INVADER);
 				create_entity(&sprite_invader, &sprite_invader_alt, &sprite_invader_death, 4+15*3, 27, INVADER);
-				create_entity(&sprite_invader, &sprite_invader_alt, &sprite_invader_death, 4+15*4, 27, INVADER);			
+				create_entity(&sprite_invader, &sprite_invader_alt, &sprite_invader_death, 4+15*4, 27, INVADER);
 				render_entities();
 			break;
 			case 2:
@@ -390,7 +390,7 @@ void saucer_hit()
 				saucer_shield(73-(sprite_shield.w),(saucer->y)+9);
 				break;
 			case 1:
-				bullet_hell = 1;	
+				bullet_hell = 1;
 				healthbar[0]->frame = 2;
 				render_entity(healthbar[0]);
 				break;
@@ -471,8 +471,8 @@ void move_saucer()
 	static enum direction saucer_dir = RIGHT;
 	if (!(--saucer_timer))
 	{
-		if (!bullet_hell) saucer_timer = (uint8_t)(2+(TICK_RATE/3) - level_speed*TICK_RATE/260);
-			else saucer_timer = (uint8_t)(2+(TICK_RATE/6) - level_speed*TICK_RATE/520);
+		if (!bullet_hell) saucer_timer = (uint8_t)(2+(TICK_RATE/2) - level_speed*TICK_RATE/520);
+			else saucer_timer = (uint8_t)(2+(TICK_RATE/3) - level_speed*TICK_RATE/520);
 	if(saucer_dir) ++(saucer->x);
 		else --(saucer->x);
 	if (((saucer->x == 0) && !saucer_dir) || ((saucer->x == 79) && saucer_dir)) saucer_dir =(saucer_dir+1)%2;
@@ -524,19 +524,19 @@ void kill_entity(Entity *e)
 			delay_ms(300);
 			reset_x = player->x; reset_y = player->y;
 			pending_reset = 1;
-			
-			
+
+
 		}
 		else if (e->type == SHIELD)
 		{
 			delete_entity(e);
 		}
 	}
-	else { 
+	else {
 		e->frame = 2;
 		++pending_kill;
 		if ((e->type) == SAUCER) { score+=200; e->val=36;}
-			else e->val=13; 
+			else e->val=13;
 	}
 	pending_render = 1;
 }

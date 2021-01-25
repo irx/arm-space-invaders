@@ -1,7 +1,7 @@
 #define TICK_RATE 50
-#define SHOOT_COOLDOWN 0
+#define SHOOT_COOLDOWN 35
 
-#define SKIP_TO_BOSS 0
+
 
 enum entity_type{ PLAYER, INVADER, SAUCER, MISSILE_GOOD, MISSILE_BAD, SHIELD, HEALTHBAR};
 enum state{ MENU, PAUSE, LEVEL };
