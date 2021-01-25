@@ -4,10 +4,41 @@
 #include "game.h"
 #include "SSD1331.h"
 
+enum entity_type {
+	PLAYER,
+	INVADER,
+	SAUCER,
+	MISSILE_GOOD,
+	MISSILE_BAD,
+	SHIELD,
+	HEALTHBAR
+};
+
+enum direction {
+	LEFT,
+	RIGHT
+};
+
+static void init_level(uint8_t, uint8_t); //player position
+static void move_invaders(void);
+static void move_player(enum direction dir);
+static void game_over(void);
+static void game_menu(void);
+static void move_projectiles(void);
+static void player_hit(void);
+static void player_shoot(void);
+static void saucer_shoot(void);
+static void game_pause(void);
+static void boss_fight(void);
+static void move_saucer(void);
+static void saucer_hit(void);
+static void kill_entity(Entity *e);
+static void saucer_shield(uint8_t, uint8_t);
 
 static Entity *player;
 static Entity *saucer;
 static Entity *healthbar[2] = {NULL, NULL};
+static enum state game_state = MENU;
 static enum direction invaders_dir = RIGHT;
 static uint8_t level_speed = 10; //default 1, max 90, temp 10 for tests
 static uint16_t score = 0;
@@ -33,12 +64,11 @@ static uint8_t boss_lives = 6;
 static uint8_t boss_cooldown = 150;
 static uint8_t boss_iframes = 0;
 static uint8_t bullet_hell = 0;
-//static uint8_t shield;
 
 
-enum state game_state = MENU;
 
-void game_loop()
+void
+game_loop(void)
 {
 	uint8_t ticks_till_move = (uint8_t)(1 + TICK_RATE);
 	Entity *k = player;
@@ -107,7 +137,7 @@ void game_loop()
 
 					if (!(--boss_cooldown)) //saucer shooting
 					{
-						boss_cooldown = 200-level_speed-80*bullet_hell;
+						boss_cooldown = 190-level_speed-70*bullet_hell;
 						saucer_shoot();
 					}
 				}
@@ -140,7 +170,8 @@ void game_loop()
 }
 
 
-void init_level(uint8_t x, uint8_t y)
+static void
+init_level(uint8_t x, uint8_t y)
 {
 	ssd1331_clear_screen(BLACK);
 	int i, j;
@@ -174,7 +205,8 @@ void init_level(uint8_t x, uint8_t y)
 }
 
 
-void game_over()
+static void
+game_over(void)
 {
 	char buf[8];
 
@@ -205,7 +237,8 @@ void game_over()
 
 }
 
-void move_invaders()
+static void
+move_invaders(void)
 {
 	Entity *i = player;
 	static uint8_t dir_swap = 0;
@@ -237,7 +270,9 @@ void move_invaders()
 	if (!animation_cooldown) animation_cooldown = 10;
 	pending_render=1;
 }
-void move_projectiles()
+
+static void
+move_projectiles(void)
 {
 	Entity *i = player; //bullet pointer
 	Entity *j = player; //scanned entities pointer
@@ -308,7 +343,9 @@ void move_projectiles()
 		}
 	}
 }
-void move_player(enum direction dir)
+
+static void
+move_player(enum direction dir)
 {
 	if ((player->x >= 1-dir) && (player->x <= 84-dir)) //out-of-bonds checking
 	{
@@ -320,7 +357,8 @@ void move_player(enum direction dir)
 
 }
 
-void player_shoot()
+static void
+player_shoot(void)
 {
 	if (!cooldown)
 	{
@@ -330,7 +368,9 @@ void player_shoot()
 
 	}
 }
-void saucer_shoot()
+
+static void
+saucer_shoot(void)
 {
 	++projectile_count;
 	static enum direction alternate = RIGHT; //fire from alternating sides
@@ -338,12 +378,14 @@ void saucer_shoot()
 	alternate=(alternate+1)%2;
 }
 
-void saucer_shield(uint8_t x, uint8_t y)
+static void
+saucer_shield(uint8_t x, uint8_t y)
 {
 	render_entity(create_entity(&sprite_shield, &sprite_shield_alt, &sprite_shield_death, x, y, SHIELD));
 }
 
-void saucer_hit()
+static void
+saucer_hit(void)
 {
 	if (!(--boss_lives))
 	{
@@ -401,7 +443,8 @@ void saucer_hit()
 
 
 
-void player_hit()
+static void
+player_hit(void)
 {
 	if (!(--lives)) game_over();
 	else { ++(player->frame); render_entity(player); }
@@ -409,20 +452,23 @@ void player_hit()
 
 }
 
-void delay_ms( int n)
+void
+delay_ms(int n)
 {
 	volatile int i, j;
 	for( i = 0 ; i < n; i++)
 	for(j = 0; j < 3440; j++) {}
 }
 
-void queue_input(enum input_type input)
+void
+queue_input(enum input_type input)
 {
 	input_queue = input_queue | input;
 }
 
 
-void game_pause()
+static void
+game_pause(void)
 {
 	char buf[8];
 
@@ -443,7 +489,8 @@ void game_pause()
 }
 
 
-void boss_fight()
+static void
+boss_fight(void)
 {
 	delay_ms(100);
 	ssd1331_clear_screen(RED);
@@ -465,14 +512,15 @@ void boss_fight()
 	render_entities();
 }
 
-void move_saucer()
+static void
+move_saucer(void)
 {
 	static uint8_t saucer_timer = 3;
 	static enum direction saucer_dir = RIGHT;
 	if (!(--saucer_timer))
 	{
-		if (!bullet_hell) saucer_timer = (uint8_t)(2+(TICK_RATE/2) - level_speed*TICK_RATE/520);
-			else saucer_timer = (uint8_t)(2+(TICK_RATE/3) - level_speed*TICK_RATE/520);
+		if (!bullet_hell) saucer_timer = (uint8_t)(2+(TICK_RATE/3) - level_speed*TICK_RATE/520);
+			else saucer_timer = (uint8_t)(2+(TICK_RATE/4) - level_speed*TICK_RATE/520);
 	if(saucer_dir) ++(saucer->x);
 		else --(saucer->x);
 	if (((saucer->x == 0) && !saucer_dir) || ((saucer->x == 79) && saucer_dir)) saucer_dir =(saucer_dir+1)%2;
@@ -480,7 +528,8 @@ void move_saucer()
 	}
 }
 
-void game_menu()
+static void
+game_menu(void)
 {
 	game_state = MENU;
 	ssd1331_clear_screen(BLACK);
@@ -492,7 +541,8 @@ void game_menu()
 	pending_reset = 1;
 }
 
-void kill_entity(Entity *e)
+static void
+kill_entity(Entity *e)
 {
 	if ((e->val)==1)
 	{
