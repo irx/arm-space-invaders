@@ -75,7 +75,7 @@ void game_loop()
 				if (!(--ticks_till_move))
 				{
 					move_invaders();
-					ticks_till_move = (uint8_t)(1 + TICK_RATE - level_speed*TICK_RATE/100);
+					ticks_till_move = (uint8_t)(1 + (TICK_RATE/1.25) - level_speed*TICK_RATE/113);
 				}
 				if (level_speed < 90)
 					{
@@ -85,14 +85,17 @@ void game_loop()
 			}
 			else //boss fight stuff
 			{
-				move_saucer();
-				if ((saucer->frame == 1) && boss_iframes) --boss_iframes;
-					else saucer->frame = 0;
-						
-				if (!(--boss_cooldown)) //saucer shooting
+				if (!(saucer->val))
 				{
-					boss_cooldown = 165-(level_speed/2);
-					saucer_shoot();
+					move_saucer();
+					if ((saucer->frame == 1) && boss_iframes) --boss_iframes;
+						else saucer->frame = 0;
+							
+					if (!(--boss_cooldown)) //saucer shooting
+					{
+						boss_cooldown = 165-(level_speed/2);
+						saucer_shoot();
+					}
 				}
 			}
 
@@ -233,12 +236,12 @@ void move_projectiles()
 				render_projectiles=1;
 				--(i->y);
 				i->frame = ((i->frame)+1)%2;
-				if((i->y)==10)
+				if(((i->y)==10) && boss)
 				{
 					if (((i->x)+(i->sprite[0]->w)-2 > saucer->x) && ((i->x)+1)<(saucer->x)+(saucer->sprite[0]->w)-1)
 					{
 						--projectile_count;
-						kill_entity(j);
+						delete_entity(i);
 						if (!boss_iframes && !(saucer->val)) saucer_hit();
 					}
 				}
@@ -250,6 +253,7 @@ void move_projectiles()
 						if((i->y)==11 && (j->type == SHIELD) && ((i->x)+(i->sprite[0]->w)-2 > (j->x)) && ((i->x)+1 < (j->x)+(j->sprite[0]->w)-1))
 						{
 							--projectile_count;
+							delete_entity(i);
 							kill_entity(j);
 						}
 						if ((j->type == INVADER) && ((i->x)+(i->sprite[0]->w)-2 > (j->x)) && ((i->x)+1 < (j->x)+(j->sprite[0]->w)-1) && (((i->y) == (j->y)+(j->sprite[0]->h)-1) || ((i->y) == (j->y)+(j->sprite[0]->h)-2)) )
@@ -263,8 +267,8 @@ void move_projectiles()
 						else if ((i->y) == 0) //projectile out of bonds
 						{
 							delete_entity(i);
-							if (healthbar[0] != NULL) render_entity(healthbar[0]);
-							if (healthbar[1] != NULL) render_entity(healthbar[1]);
+							//if (healthbar[0] != NULL) render_entity(healthbar[0]);
+							//if (healthbar[1] != NULL) render_entity(healthbar[1]);
 						}
 					}
 				}
@@ -323,10 +327,11 @@ void saucer_hit()
 	{
 		kill_entity(saucer);
 		delete_entity(healthbar[0]);
+		healthbar[0] = NULL;
 	}
 	else
 	{
-		boss_iframes = 2*TICK_RATE;
+		boss_iframes = 3*TICK_RATE;
 		saucer->frame = 1;
 		switch (boss_lives)
 		{
@@ -340,15 +345,16 @@ void saucer_hit()
 				break;
 			case 3:
 				delete_entity(healthbar[1]);
-				break;
+				healthbar[1] = NULL;
+			break;
 			case 2:
 				healthbar[0]->frame = 1;
-				render_entity(healthbar[1]);
+				render_entity(healthbar[0]);
 				break;
 			case 1:
 				healthbar[0]->frame = 2;
-				render_entity(healthbar[1]);
-				break;		
+				render_entity(healthbar[0]);
+				break;
 		}
 	}
 
@@ -413,7 +419,8 @@ void boss_fight()
 	healthbar[0] = create_entity(&sprite_bar1, &sprite_bar2, &sprite_bar3, 0, 0, HEALTHBAR);
 	healthbar[1] = create_entity(&sprite_bar1, &sprite_bar2, &sprite_bar3, 48, 0, HEALTHBAR);
 	boss=1;
-	//healthbar
+	boss_iframes = 3*TICK_RATE;
+	saucer->frame = 1;
 	render_entities();
 }
 
@@ -457,11 +464,22 @@ void kill_entity(Entity *e)
 				boss_fight();
 			}
 		}
+		else if (e->type == SAUCER)
+		{
+			delete_entity(e);
+			saucer = NULL;
+			boss = 0;
+		}
 		else if (e->type == SHIELD)
 		{
 			delete_entity(e);
 		}
 	}
-	else { (e->frame)=2; (e->val)=12; ++pending_kill;}
+	else { 
+		e->frame = 2;
+		++pending_kill;
+		if ((e->type) == SAUCER) e->val=33;
+			else e->val=13; 
+	}
 	pending_render = 1;
 }
