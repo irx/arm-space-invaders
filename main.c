@@ -20,8 +20,6 @@
 int
 main(void)
 {
-	Entity *logo, *invader;
-
 	spi_init();
 	ssd1331_init();
 	uart_init();

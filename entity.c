@@ -79,6 +79,12 @@ delete_entity(Entity *e)
 }
 
 void
+render_entity(Entity *e)
+{
+	draw_sprite(e->sprite[e->frame], e->x, e->y);
+}
+
+void
 render_entities(void)
 {
 	Entity *e = entity_first;
@@ -86,9 +92,4 @@ render_entities(void)
 		draw_sprite(e->sprite[e->frame], e->x, e->y);
 		e = e->next;
 	}
-}
-Entity *
-render_entity(Entity *e)
-{
-	draw_sprite(e->sprite[e->frame], e->x, e->y);
 }
