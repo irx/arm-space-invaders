@@ -240,9 +240,8 @@ game_over(void)
 static void
 move_invaders(void)
 {
-	Entity *i = player;
-	static uint8_t dir_swap = 0;
-	static uint8_t move_down = 0;
+	Entity *i;
+	static uint8_t dir_swap = 0, move_down = 0;
 
 	i = player;
 	while (i->next != NULL) //moving left|right
@@ -250,25 +249,27 @@ move_invaders(void)
 		i = i->next;
 		if (i->type == INVADER)
 		{
-			if (move_down)
-			{
-				++(i->y);
-				if ((i->y)>43) game_over();
+			if (move_down && ++(i->y) > 43) {
+				game_over();
+				return;
 			}
-			else if (((i->x == 1) && !invaders_dir) || ((i->x == 81) && invaders_dir)) dir_swap = 1; //checking if direction swap takes place
+			if (((i->x == 1) && !invaders_dir) || ((i->x == 81) && invaders_dir))
+				dir_swap = 1; //checking if direction swap takes place
 
 			if (!animation_cooldown && i->frame != 2) // animate 'em!
-				{
-					i->frame = ((i->frame)+1)%2;
-				}
-			if (invaders_dir) ++(i->x);
-			else --(i->x);
+				i->frame = ((i->frame) + 1) % 2;
+			i->x += invaders_dir ? 1 : -1;
 		}
 	}
-	if (dir_swap){ invaders_dir = (invaders_dir+1)%2; move_down = 1; dir_swap = 0;}
-		else move_down = 0;
-	if (!animation_cooldown) animation_cooldown = 10;
-	pending_render=1;
+	if (dir_swap) {
+		invaders_dir = (invaders_dir + 1) % 2;
+		move_down = 1;
+		dir_swap = 0;
+	} else
+		move_down = 0;
+	if (!animation_cooldown)
+		animation_cooldown = 10;
+	pending_render = 1;
 }
 
 static void
